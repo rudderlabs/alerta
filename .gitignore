@@ -115,3 +115,5 @@ pg-data/
 *.log*
 .vscode
 .env.development
+values.yaml
+
