@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: alerta-pgbouncer
+spec:
+  selector:
+    app: alerta-pgbouncer
+  ports:
+    - port: 6432
+      targetPort: 6432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alerta-pgbouncer
+  labels:
+    app: alerta-pgbouncer
+spec:
+  selector:
+    matchLabels:
+      app: alerta-pgbouncer
+  template:
+    metadata:
+      labels:
+        app: alerta-pgbouncer
+    spec:
+      containers:
+      - name: alerta-pgbouncer
+        image: brainsam/pgbouncer:latest
+        ports:
+        - containerPort: 6432
+        env:
+        - name: DB_HOST
+          value: {{ .Values.postgresql.serviceName }}
+        - name: DB_USER
+          value: {{ .Values.postgresql.postgresqlUsername }}
+        - name: DB_PASSWORD
+          value: {{ .Values.postgresql.postgresqlPassword }}
+        - name: DEFAULT_POOL_SIZE
+          value: {{ .Values.pgbouncer.POOL_SIZE | quote }}
+        - name: MAX_CLIENT_CONN
+          value: {{ .Values.pgbouncer.MAX_CLIENT_CONN | quote }}
+        - name: LISTEN_PORT
+          value: "6432"
