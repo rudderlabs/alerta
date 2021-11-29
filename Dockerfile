@@ -62,6 +62,9 @@ RUN /venv/bin/pip install alerta==${CLIENT_VERSION} alerta-server==8.6.3
 COPY install-plugins.sh /app/install-plugins.sh
 COPY plugins.txt /app/plugins.txt
 RUN /app/install-plugins.sh
+ADD rudder-alerta-enrichment-plugin/ /opt/rudder-alerta-enrichment-plugin/
+RUN /venv/bin/python /opt/rudder-alerta-enrichment-plugin/setup.py install
+
 
 ENV ALERTA_SVR_CONF_FILE /app/alertad.conf
 ENV ALERTA_CONF_FILE /app/alerta.conf

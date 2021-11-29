@@ -117,3 +117,4 @@ pg-data/
 .env.development
 values.yaml
 
+rudder-alerta-enrichment-plugin/
