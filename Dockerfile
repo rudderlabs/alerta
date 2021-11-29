@@ -63,7 +63,8 @@ COPY install-plugins.sh /app/install-plugins.sh
 COPY plugins.txt /app/plugins.txt
 RUN /app/install-plugins.sh
 ADD rudder-alerta-enrichment-plugin/ /opt/rudder-alerta-enrichment-plugin/
-RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/python /opt/rudder-alerta-enrichment-plugin/setup.py install && rm -rf /opt/rudder-alerta-enrichment-plugin/
+# RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/pip install -r requirements.txt && mv rudder_enrichment /venv/lib/python3.7/site-packages/ && rm -rf /opt/rudder-alerta-enrichment-plugin/
+RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/python setup.py install
 
 
 ENV ALERTA_SVR_CONF_FILE /app/alertad.conf
