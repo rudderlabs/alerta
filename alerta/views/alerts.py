@@ -77,7 +77,8 @@ def receive():
         raise ApiError(str(e), 500)
     write_audit_trail.send(current_app._get_current_object(), event='alert-received', message=alert.text, user=g.login,
                            customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert', request=request)
-    EventLog.from_alert(alert).create()
+    if not alert.repeat:
+        EventLog.from_alert(alert).create()
     if alert:
         return jsonify(status='ok', id=alert.id, alert=alert.serialize), 201
     else:
