@@ -5,7 +5,7 @@ import statsd
 STATS_URL = os.environ['STATS_URL']
 STATS_PORT = int(os.environ['STATS_PORT'])
 
-stats_client = statsd.StatsClient(STATS_URL, STATS_PORT)
+stats_client = statsd.StatsClient(STATS_URL, STATS_PORT,prefix='notisrvr')
 
 
 class StatsD:
