@@ -27,21 +27,12 @@ class CustomerChannel:
             if not isinstance(emails, list) or len(emails) == 0:
                 raise Exception("Emails list cannot be empty")
             for index, email in enumerate(emails):
-                if not isinstance(email, str) or email.strip() == "":
-                    raise Exception(f"Email value at position {index + 1} is not valid")
-                try:
-                    validators.email(email)
-                except Exception as e:
+                if not validators.email(email):
                     raise Exception(f"Email value at position {index + 1} is not valid")
         elif self.channel_type == "webhook":
             url = self.properties.get('url')
-            if not isinstance(url, str) or not url.strip() == "":
+            if not validators.url(url):
                 raise Exception("Webhook property 'url' is required and cannot be empty")
-            try:
-                validators.url(url)
-            except Exception as e:
-                raise Exception("Webhook property 'url' is required and cannot be empty")
-
         return CustomerChannel.from_db(db.create_channel(self))
 
     @classmethod
