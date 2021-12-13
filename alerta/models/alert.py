@@ -77,6 +77,7 @@ class Alert:
         self.last_receive_time = kwargs.get('last_receive_time', None)
         self.update_time = kwargs.get('update_time', None)
         self.history = kwargs.get('history', None) or list()
+        self.enriched_data = kwargs.get('enriched_data', None)
 
     @classmethod
     def parse(cls, json: JSON) -> 'Alert':
@@ -112,7 +113,8 @@ class Alert:
             create_time=DateTime.parse(json['createTime']) if 'createTime' in json else None,
             timeout=json.get('timeout', None),
             raw_data=json.get('rawData', None),
-            customer=json.get('customer', None)
+            customer=json.get('customer', None),
+            enriched_data=json.get('enriched_data', None)
         )
 
     @property
@@ -146,7 +148,8 @@ class Alert:
             'lastReceiveId': self.last_receive_id,
             'lastReceiveTime': self.last_receive_time,
             'updateTime': self.update_time,
-            'history': [h.serialize for h in sorted(self.history, key=lambda x: x.update_time)]
+            'history': [h.serialize for h in sorted(self.history, key=lambda x: x.update_time)],
+            'enriched_data': self.enriched_data
         }
 
     @property
@@ -179,6 +182,7 @@ class Alert:
             'lastReceiveId': self.last_receive_id,
             'lastReceiveTime': self.last_receive_time.isoformat(),
             'updateTime': self.update_time.isoformat(),
+            'enriched_data': self.enriched_data,
         }
 
     def get_id(self, short: bool = False) -> str:
@@ -229,7 +233,8 @@ class Alert:
             last_receive_id=doc.get('lastReceiveId', None),
             last_receive_time=doc.get('lastReceiveTime', None),
             update_time=doc.get('updateTime', None),
-            history=[History.from_db(h) for h in doc.get('history', list())]
+            history=[History.from_db(h) for h in doc.get('history', list())],
+            enriched_data=doc.get('enriched_data', None),
         )
 
     @classmethod
@@ -262,7 +267,8 @@ class Alert:
             last_receive_id=rec.last_receive_id,
             last_receive_time=rec.last_receive_time,
             update_time=getattr(rec, 'update_time'),
-            history=[History.from_db(h) for h in rec.history]
+            history=[History.from_db(h) for h in rec.history],
+            enriched_data=rec.enriched_data,
         )
 
     @classmethod
