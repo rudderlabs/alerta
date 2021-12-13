@@ -69,6 +69,26 @@ class Rule:
             return cls.from_record(r)
 
     def create(self) -> 'Rule':
+        if self.name.strip() == "":
+            raise Exception("Rule-name must be a name string")
+        if len(self.rules) == 0:
+            raise Exception("Rules expects 'rules' property to be passed, a list of fields")
+        for rule in self.rules:
+            fields = rule.get('fields')
+            if not isinstance(fields, list):
+                raise Exception("Fields property under rules list must be a list of field,regex values")
+            for _field in fields:
+                if not isinstance(_field, dict):
+                    raise Exception("fields must be of format \"{'field':'field_name','regex':'regex_value'}\"")
+                field, regex = _field.get("field", ""), _field.get("regex", "")
+                if not field or not field.strip():
+                    raise Exception("Supported fields are resource, event, tags, severity")
+                if not regex or not regex.strip():
+                    raise Exception("Regex value cannot be empty")
+                try:
+                    re.compile(regex)
+                except Exception as e:
+                    raise Exception("Regex value is an invalid one, please verify the regex you've passed")
         return Rule.from_db(db.create_rule(self))
 
     @staticmethod

@@ -277,6 +277,15 @@ CREATE TABLE IF NOT EXISTS worker_event_id_map(
     last_heart_beat_at TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS worker_failed_deliveries(
+    id SERIAL PRIMARY KEY,
+    worker_id text,
+    error text,
+    event_properties jsonb,
+    channel_properties jsonb,
+    created_at timestamp
+);
+
 ALTER TABLE IF EXISTS alerts add if not exists enriched_data jsonb;
 
 CREATE UNIQUE INDEX IF NOT EXISTS env_res_evt_cust_key ON alerts USING btree (environment, resource, event, (COALESCE(customer, ''::text)));
