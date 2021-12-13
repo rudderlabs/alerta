@@ -239,6 +239,10 @@ class Alert:
 
     @classmethod
     def from_record(cls, rec) -> 'Alert':
+        try:
+            enriched_data = rec.enriched_data
+        except AttributeError as e:
+            enriched_data = None
         return Alert(
             id=rec.id,
             resource=rec.resource,
@@ -268,7 +272,7 @@ class Alert:
             last_receive_time=rec.last_receive_time,
             update_time=getattr(rec, 'update_time'),
             history=[History.from_db(h) for h in rec.history],
-            enriched_data=rec.enriched_data,
+            enriched_data=enriched_data,
         )
 
     @classmethod
