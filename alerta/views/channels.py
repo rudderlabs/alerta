@@ -1,3 +1,5 @@
+import logging
+
 from flask import request, jsonify
 from flask_cors import cross_origin
 
@@ -10,6 +12,8 @@ from ..exceptions import ApiError
 from ..models.Rules import Rule
 from ..models.channel import CustomerChannel
 from ..models.channel_rule import CustomerChannelRuleMap
+
+log_object = logging.getLogger('alerta.views.customer_channel')
 
 
 @api.route("/channel", methods=['POST'])

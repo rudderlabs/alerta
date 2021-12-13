@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import validators
@@ -29,11 +30,11 @@ class CustomerChannel:
             if not isinstance(emails, list) or len(emails) == 0:
                 raise Exception("Emails property must be list of emails")
             for index, email in enumerate(emails):
-                if not validators.email(email):
+                if not validators.email(email or ''):
                     raise Exception(f"Email value at position {index + 1} is not valid")
         elif self.channel_type == "webhook":
-            url = self.properties.get('url')
-            if not validators.url(url):
+            url = self.properties.get('url', '')
+            if not validators.url(url or ''):
                 raise Exception("Webhook property 'url' is required and cannot be empty")
         return CustomerChannel.from_db(db.create_channel(self))
 
@@ -76,7 +77,7 @@ class CustomerChannel:
         return CustomerChannel.from_db(db.delete_channel_by_id(channel_id))
 
     @classmethod
-    def parse(cls, json: JSON) -> 'Rule':
+    def parse(cls, json: JSON) -> 'CustomerChannel':
         if not isinstance(json.get('name'), str) or json.get('name').strip() == "":
             raise Exception("Channel name is required, it must be a string")
         if json.get('channel_type') not in CustomerChannel.SUPPORTED_CHANNEL_TYPES:
