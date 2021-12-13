@@ -27,7 +27,7 @@ class CustomerChannel:
         if self.channel_type == "email":
             emails = self.properties.get("emails", [])
             if not isinstance(emails, list) or len(emails) == 0:
-                raise Exception("Emails list cannot be empty")
+                raise Exception("Emails property must be list of emails")
             for index, email in enumerate(emails):
                 if not validators.email(email):
                     raise Exception(f"Email value at position {index + 1} is not valid")
