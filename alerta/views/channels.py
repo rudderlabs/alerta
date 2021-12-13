@@ -7,6 +7,7 @@ from alerta.utils.response import jsonp
 
 from . import api
 from ..exceptions import ApiError
+from ..models.Rules import Rule
 from ..models.channel import CustomerChannel
 from ..models.channel_rule import CustomerChannelRuleMap
 
@@ -77,8 +78,29 @@ def delete_channel_by_id(channel_id):
 @permission(Scope.write_rules)
 @jsonp
 def link_channel_rule():
-    channel_id = request.json['channel_id']
-    rule_id = request.json['rule_id']
+    customer_id = request.args.get('customer_id')
+    if not customer_id or not customer_id.strip() == "":
+        raise ApiError("'customer_id' query parameter is missing for the request")
+    try:
+        channel_id = int(request.json['channel_id'])
+    except KeyError as e:
+        raise Exception("'channel_id' is missing in the request body")
+    except ValueError as e:
+        raise Exception("'channel_id' must be an integer")
+    try:
+        rule_id = request.json['rule_id']
+    except KeyError as e:
+        raise Exception("'rule_id' is missing in the request body")
+    except ValueError as e:
+        raise Exception("'rule_id' must be an integer")
+    rule = Rule.find_by_id(rule_id, customer_id)
+    if not rule:
+        raise ApiError(f"Rule not found {rule_id} for the customer {customer_id}")
+    customer_channel = CustomerChannel.find_by_id(channel_id)
+    if not customer_channel:
+        raise ApiError(f"Channel {channel_id} not found")
+    if customer_channel.customer_id != rule.customer_id:
+        raise ApiError(f"Channel {channel_id} and Rule {rule_id} cannot be mapped.")
     channel_rule_map = CustomerChannelRuleMap(channel_id, rule_id)
     channel_rule_map = channel_rule_map.create()
     if not channel_rule_map:
