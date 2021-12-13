@@ -15,7 +15,7 @@ from ..models.Rules import Rule
 @jsonp
 def create_customer_alert_forward_rule():
     request_payload = request.json
-    rule = Rule(**request_payload)
+    rule = Rule.parse(request_payload)
     try:
         rule = rule.create()
     except Exception as e:

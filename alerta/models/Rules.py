@@ -19,6 +19,14 @@ class Rule:
 
     @classmethod
     def parse(cls, json: JSON) -> 'Rule':
+        if not isinstance(json.get('customer_id'), str) or json.get('customer_id').strip() == "":
+            raise Exception("customer_id is required, it must be a string")
+        if not isinstance(json.get('is_active'), bool):
+            raise Exception("is_active is required, it must be a boolean")
+        if not isinstance(json.get('rules'), list):
+            raise Exception("rules is required, it must be a list")
+        if not isinstance(json.get('name'), str) or json.get('name').strip() == "":
+            raise Exception("name is required, it must be a string")
         return Rule(
             id=json.get('id', None),
             customer_id=json.get('customer_id', None),
