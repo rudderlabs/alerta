@@ -86,28 +86,28 @@ def delete_channel_by_id(channel_id):
 @jsonp
 def link_channel_rule():
     customer_id = request.args.get('customer_id')
-    if not customer_id or not customer_id.strip() == "":
-        raise ApiError("'customer_id' query parameter is missing for the request")
+    if not customer_id or customer_id.strip() == "":
+        raise ApiError("'customer_id' query parameter is missing for the request", 400)
     try:
         channel_id = int(request.json['channel_id'])
     except KeyError as e:
-        raise Exception("'channel_id' is missing in the request body")
+        raise Exception("'channel_id' is missing in the request body", 400)
     except ValueError as e:
-        raise Exception("'channel_id' must be an integer")
+        raise Exception("'channel_id' must be an integer", 400)
     try:
         rule_id = request.json['rule_id']
     except KeyError as e:
-        raise Exception("'rule_id' is missing in the request body")
+        raise Exception("'rule_id' is missing in the request body", 400)
     except ValueError as e:
-        raise Exception("'rule_id' must be an integer")
+        raise Exception("'rule_id' must be an integer", 400)
     rule = Rule.find_by_id(rule_id, customer_id)
     if not rule:
-        raise ApiError(f"Rule not found {rule_id} for the customer {customer_id}")
+        raise ApiError(f"Rule not found {rule_id} for the customer {customer_id}", 400)
     customer_channel = CustomerChannel.find_by_id(channel_id)
     if not customer_channel:
-        raise ApiError(f"Channel {channel_id} not found")
+        raise ApiError(f"Channel {channel_id} not found", 400)
     if customer_channel.customer_id != rule.customer_id:
-        raise ApiError(f"Channel {channel_id} and Rule {rule_id} cannot be mapped.")
+        raise ApiError(f"Channel {channel_id} and Rule {rule_id} cannot be mapped.", 400)
     channel_rule_map = CustomerChannelRuleMap(channel_id, rule_id)
     channel_rule_map = channel_rule_map.create()
     if not channel_rule_map:
