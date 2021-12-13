@@ -17,8 +17,11 @@ from ..models.channel_rule import CustomerChannelRuleMap
 @permission(Scope.write_rules)
 @jsonp
 def create_channel():
-    channel = CustomerChannel(**request.json)
-    channel = channel.create()
+    try:
+        channel = CustomerChannel.parse(request.json)
+        channel = channel.create()
+    except Exception as e:
+        return jsonify(status='error', message=str(e)), 400
     if not channel:
         raise ApiError("Cannot create customer channel")
     return jsonify(status='ok', channel=channel.serialize)

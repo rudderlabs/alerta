@@ -4,6 +4,8 @@ import validators
 
 from alerta.app import db
 
+JSON = Dict[str, Any]
+
 
 class CustomerChannel:
     SUPPORTED_CHANNEL_TYPES = ["webhook", "email"]
@@ -72,3 +74,15 @@ class CustomerChannel:
     @staticmethod
     def delete_by_id(channel_id):
         return CustomerChannel.from_db(db.delete_channel_by_id(channel_id))
+
+    @classmethod
+    def parse(cls, json: JSON) -> 'Rule':
+        if not isinstance(json.get('name'), str) or json.get('name').strip() == "":
+            raise Exception("Channel name is required, it must be a string")
+        if json.get('channel_type') not in CustomerChannel.SUPPORTED_CHANNEL_TYPES:
+            raise Exception(f"Channel type must be one of {CustomerChannel.SUPPORTED_CHANNEL_TYPES}")
+        if not isinstance(json.get('properties'), dict):
+            raise Exception("Channel properties are required")
+        if not isinstance(json.get('customer_id'), str) or json.get('customer_id').strip() == "":
+            raise Exception("customer_id is required, it must be a string")
+        return CustomerChannel(**json)
