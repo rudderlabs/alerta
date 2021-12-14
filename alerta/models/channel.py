@@ -19,6 +19,10 @@ class CustomerChannel:
         self.customer_id = customer_id
 
     def create(self):
+        self.validate()
+        return CustomerChannel.from_db(db.create_channel(self))
+
+    def validate(self):
         if not isinstance(self.name, str) or not self.name.strip():
             raise Exception("Channel name must be a valid text value")
         if self.channel_type not in CustomerChannel.SUPPORTED_CHANNEL_TYPES:
@@ -36,7 +40,6 @@ class CustomerChannel:
             url = self.properties.get('url', '')
             if not validators.url(url or ''):
                 raise Exception("Webhook property 'url' is required and cannot be empty")
-        return CustomerChannel.from_db(db.create_channel(self))
 
     @classmethod
     def from_record(cls, rec) -> 'CustomerChannel':
@@ -65,16 +68,24 @@ class CustomerChannel:
                 db.get_channels(customer_id, sort_by, ascending, limit, offset)]
 
     @staticmethod
-    def find_by_id(channel_id):
-        return CustomerChannel.from_db(db.find_channel_by_id(channel_id))
+    def find_by_id(customer_id, channel_id):
+        return CustomerChannel.from_db(db.find_channel_by_id(customer_id, channel_id))
 
     @staticmethod
-    def update_by_id(channel_id, name=None, properties=None, **kwargs):
-        return CustomerChannel.from_db(db.update_channel_by_id(channel_id, name, properties))
+    def update_by_id(customer_id, channel_id, name=None, properties=None, **kwargs):
+        customer_channel = CustomerChannel.find_by_id(customer_id, channel_id)
+        if not customer_channel:
+            raise Exception("not found")
+        if name:
+            customer_channel.name = name
+        if properties:
+            customer_channel.properties = properties
+        customer_channel.validate()
+        return CustomerChannel.from_db(db.update_channel_by_id(customer_id, channel_id, name, properties))
 
     @staticmethod
-    def delete_by_id(channel_id):
-        return CustomerChannel.from_db(db.delete_channel_by_id(channel_id))
+    def delete_by_id(customer_id, channel_id):
+        return CustomerChannel.from_db(db.delete_channel_by_id(customer_id, channel_id))
 
     @classmethod
     def parse(cls, json: JSON) -> 'CustomerChannel':

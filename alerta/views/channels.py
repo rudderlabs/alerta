@@ -52,7 +52,10 @@ def get_channels():
 @permission(Scope.read_rules)
 @jsonp
 def get_channel_by_id(channel_id):
-    channel = CustomerChannel.find_by_id(channel_id)
+    customer_id = request.args.get('customer_id')
+    if not customer_id:
+        raise ApiError('customer_id not present in query parameters')
+    channel = CustomerChannel.find_by_id(customer_id, channel_id)
     if not channel:
         raise ApiError('not found', 404)
     return jsonify(channel=channel.serialize)
@@ -63,7 +66,13 @@ def get_channel_by_id(channel_id):
 @permission(Scope.write_rules)
 @jsonp
 def update_channel_by_id(channel_id):
-    channel = CustomerChannel.update_by_id(channel_id, **request.json)
+    customer_id = request.args.get('customer_id')
+    if not customer_id:
+        raise ApiError('customer_id not present in query parameters')
+    try:
+        channel = CustomerChannel.update_by_id(customer_id, channel_id, **request.json)
+    except Exception as e:
+        raise ApiError(str(e), 400)
     if not channel:
         raise ApiError("not found", 404)
     return jsonify(channel=channel.serialize)
@@ -74,7 +83,10 @@ def update_channel_by_id(channel_id):
 @permission(Scope.write_rules)
 @jsonp
 def delete_channel_by_id(channel_id):
-    channel = CustomerChannel.delete_by_id(channel_id)
+    customer_id = request.args.get('customer_id')
+    if not customer_id:
+        raise ApiError('customer_id not present in query parameters')
+    channel = CustomerChannel.delete_by_id(customer_id, channel_id)
     if not channel:
         raise ApiError("not found", 404)
     return jsonify(status='ok')
@@ -103,7 +115,7 @@ def link_channel_rule():
     rule = Rule.find_by_id(rule_id, customer_id)
     if not rule:
         raise ApiError(f"Rule not found {rule_id} for the customer {customer_id}", 400)
-    customer_channel = CustomerChannel.find_by_id(channel_id)
+    customer_channel = CustomerChannel.find_by_id(customer_id, channel_id)
     if not customer_channel:
         raise ApiError(f"Channel {channel_id} not found", 400)
     if customer_channel.customer_id != rule.customer_id:

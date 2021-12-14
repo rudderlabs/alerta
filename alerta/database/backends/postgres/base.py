@@ -1703,11 +1703,11 @@ class Backend(Database):
         query = f"""select * from customer_channels where customer_id=%(customer_id)s order by {sort_by} {ascending_order} """
         return self._fetchall(query, {"customer_id": customer_id}, limit, offset)
 
-    def find_channel_by_id(self, channel_id):
-        query = f"""select * from customer_channels where id={channel_id}"""
+    def find_channel_by_id(self, customer_id, channel_id):
+        query = f"""select * from customer_channels where customer_id='{customer_id}' and id={channel_id}"""
         return self._fetchone(query, ())
 
-    def update_channel_by_id(self, channel_id, name=None, properties=None):
+    def update_channel_by_id(self, customer_id, channel_id, name=None, properties=None):
         updated_list = []
         if isinstance(name, str):
             updated_list.append("name=%(name)s")
@@ -1715,11 +1715,12 @@ class Backend(Database):
             updated_list.append("properties=%(properties)s")
         if len(updated_list) == 0:
             return
-        query = f"UPDATE customer_channels set {','.join(updated_list)} where id={channel_id} returning * "
+        query = f"""UPDATE customer_channels set {','.join(updated_list)} 
+        where customer_id='{customer_id}' and id={channel_id} returning * """
         return self._updateone(query, {"name": name, "properties": properties}, returning=True)
 
-    def delete_channel_by_id(self, channel_id):
-        query = f"DELETE from customer_channels where id={channel_id} returning * "
+    def delete_channel_by_id(self, customer_id, channel_id):
+        query = f"DELETE from customer_channels where customer_id='{customer_id}' and id={channel_id} returning * "
         return self._deleteone(query, (), True)
 
     def create_customer_rule_map(self, customer_channel_rule_map):
