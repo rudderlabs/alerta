@@ -9,10 +9,11 @@ LABEL maintainer="Nick Satterly <nick.satterly@gmail.com>"
 ARG BUILD_DATE=now
 ARG VCS_REF
 ARG VERSION
-
+ARG COMMIT_ID_VALUE
 ENV SERVER_VERSION=${VERSION}
 ENV CLIENT_VERSION=8.5.0
 ENV WEBUI_VERSION=8.5.0
+ENV COMMIT_ID=${COMMIT_ID_VALUE}
 
 LABEL org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.url="https://alerta.io" \

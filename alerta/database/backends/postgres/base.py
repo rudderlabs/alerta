@@ -1741,3 +1741,7 @@ class Backend(Database):
         RETURNING *
         """
         return self._insert(query, vars(event_log))
+
+    def health_check(self):
+        query = """select 'ALERTA SERVER' as msg,NOW() as time;"""
+        return self._fetchone(query, {})
