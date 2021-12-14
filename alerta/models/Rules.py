@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import uuid4
@@ -65,7 +66,7 @@ class Rule:
         return Rule(
             id=rec.id,
             customer_id=rec.customer_id,
-            rules=rec.rules,
+            rules=[json.loads(s) for s in rec.rules],
             is_active=rec.is_active,
             name=rec.name
         )
@@ -78,8 +79,14 @@ class Rule:
             return cls.from_record(r)
 
     def create(self) -> 'Rule':
+        self.validate()
+        return Rule.from_db(db.create_rule(self))
+
+    def validate(self):
         if self.name.strip() == "":
             raise Exception("Rule-name must be a name string")
+        if not isinstance(self.is_active, bool):
+            raise Exception("is_active must be either true or false")
         if len(self.rules) == 0:
             raise Exception("Rules expects 'rules' property to be passed, a list of fields")
         for rule in self.rules:
@@ -98,7 +105,6 @@ class Rule:
                     re.compile(regex)
                 except Exception as e:
                     raise Exception("Regex value is an invalid one, please verify the regex you've passed")
-        return Rule.from_db(db.create_rule(self))
 
     @staticmethod
     def find_by_id(id: int, customer_id: str) -> Optional['Rule']:
@@ -125,8 +131,18 @@ class Rule:
         raise NotImplementedError()
 
     @staticmethod
-    def update_by_id(rule_id, customer_id, **kwargs):
-        return Rule.from_db(db.update_rule_by_id(rule_id, customer_id, **kwargs))
+    def update_by_id(rule_id, customer_id, rules=None, is_active=None, name=None):
+        rule = Rule.find_by_id(rule_id, customer_id)
+        if not rule:
+            raise Exception("not found")
+        if isinstance(rules, list):
+            rule.rules = rules
+        if isinstance(is_active, bool):
+            rule.is_active = is_active
+        if isinstance(name, str):
+            rule.name = name
+        rule.validate()
+        return Rule.from_db(db.update_rule_by_id(rule_id, customer_id, rules=rules, is_active=is_active, name=name))
 
     @staticmethod
     def delete_by_id(rule_id, customer_id):

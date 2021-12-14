@@ -67,7 +67,10 @@ def update_rule_by_rule_id(rule_id):
     """
     request_json.pop('customer_id', None)
     request_json.pop('id', None)
-    rule = Rule.update_by_id(rule_id, customer_id, **request_json)
+    try:
+        rule = Rule.update_by_id(rule_id, customer_id, **request_json)
+    except Exception as e:
+        raise ApiError(str(e), 400)
     if not rule:
         raise ApiError('not found', 404)
     return jsonify(status='ok', rule=rule.serialize)
