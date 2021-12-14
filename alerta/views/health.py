@@ -13,6 +13,6 @@ log_object = logging.getLogger('alerta.views.health')
 @cross_origin()
 def health_endpoint():
     try:
-        return jsonify(status='ok', message=HealthCheck.health_check()), 200
+        return jsonify(status='ok', message={"status": "up", **HealthCheck.health_check()}), 200
     except Exception as e:
-        return jsonify(status='error', message=dict(error=e)), 400
+        return jsonify(status='error', message=dict(status="down", error=e)), 400
