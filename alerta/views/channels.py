@@ -38,7 +38,7 @@ def create_channel():
 def get_channels():
     customer_id = request.args.get('customer_id')
     if not customer_id:
-        raise ApiError('customer_id not present in query parameters')
+        raise ApiError('customer_id not present in query parameters', 400)
     sort_by = request.args.get('sort_by', 'id')
     limit = int(request.args.get('limit', 10))
     offset = int(request.args.get('offset', 0))
@@ -54,7 +54,7 @@ def get_channels():
 def get_channel_by_id(channel_id):
     customer_id = request.args.get('customer_id')
     if not customer_id:
-        raise ApiError('customer_id not present in query parameters')
+        raise ApiError('customer_id not present in query parameters', 400)
     channel = CustomerChannel.find_by_id(customer_id, channel_id)
     if not channel:
         raise ApiError('not found', 404)
@@ -68,7 +68,7 @@ def get_channel_by_id(channel_id):
 def update_channel_by_id(channel_id):
     customer_id = request.args.get('customer_id')
     if not customer_id:
-        raise ApiError('customer_id not present in query parameters')
+        raise ApiError('customer_id not present in query parameters', 400)
     try:
         channel = CustomerChannel.update_by_id(customer_id, channel_id, **request.json)
     except Exception as e:
@@ -85,7 +85,7 @@ def update_channel_by_id(channel_id):
 def delete_channel_by_id(channel_id):
     customer_id = request.args.get('customer_id')
     if not customer_id:
-        raise ApiError('customer_id not present in query parameters')
+        raise ApiError('customer_id not present in query parameters', 400)
     channel = CustomerChannel.delete_by_id(customer_id, channel_id)
     if not channel:
         raise ApiError("not found", 404)
