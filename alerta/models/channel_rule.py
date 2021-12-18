@@ -33,5 +33,10 @@ class CustomerChannelRuleMap:
         }
 
     @staticmethod
-    def delete_by_id(channel_rule_map_id):
-        return CustomerChannelRuleMap.from_db(db.delete_customer_rule_map_by_id(channel_rule_map_id))
+    def delete_by_id(customer_id, channel_rule_map_id):
+        return CustomerChannelRuleMap.from_db(db.delete_customer_rule_map_by_id(customer_id, channel_rule_map_id))
+
+    @staticmethod
+    def get_channel_rules(customer_id):
+        return [CustomerChannelRuleMap.from_db(r) for r in
+                db.get_customer_channel_rule_maps_by_customer_id(customer_id)]

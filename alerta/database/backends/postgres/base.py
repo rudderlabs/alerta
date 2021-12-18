@@ -1731,8 +1731,12 @@ class Backend(Database):
                 """
         return self._insert(insert, vars(customer_channel_rule_map))
 
-    def delete_customer_rule_map_by_id(self, customer_rule_map_id):
-        query = f"DELETE from customer_channel_rules_map where id={customer_rule_map_id} returning * "
+    def delete_customer_rule_map_by_id(self, channel_id, customer_rule_map_id):
+        query = f"""DELETE from customer_channel_rules_map where id=(
+            select customer_channel_rules_map.id from customer_channel_rules_map join customer_channels on
+            customer_channel_rules_map.channel_id=customer_channels.id and customer_channels.customer_id='{channel_id}'
+            and customer_channel_rules_map.id={customer_rule_map_id}
+        ) returning * """
         return self._deleteone(query, (), True)
 
     def create_event_log(self, event_log):
@@ -1746,3 +1750,10 @@ class Backend(Database):
     def health_check(self):
         query = """select 'ALERTA SERVER' as msg,NOW() as time;"""
         return self._fetchone(query, {})
+
+    def get_customer_channel_rule_maps_by_customer_id(self, customer_id, limit=100, offset=0):
+        query = f"""select customer_channel_rules_map.* from customer_channel_rules_map join customer_channels on 
+            customer_channel_rules_map.channel_id=customer_channels.id and customer_channels.customer_id='{customer_id}'
+            order by customer_channel_rules_map.id asc
+        """
+        return self._fetchall(query, {}, limit=limit, offset=offset)

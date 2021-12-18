@@ -135,7 +135,22 @@ def link_channel_rule():
 @permission(Scope.write_rules)
 @jsonp
 def unlink_channel_rule(channel_rule_map_id):
-    channel_rule_map = CustomerChannelRuleMap.delete_by_id(int(channel_rule_map_id))
+    customer_id = request.args.get('customer_id')
+    if not customer_id or customer_id.strip() == "":
+        raise ApiError("'customer_id' query parameter is missing for the request", 400)
+    channel_rule_map = CustomerChannelRuleMap.delete_by_id(customer_id, int(channel_rule_map_id))
     if channel_rule_map:
         return jsonify(status='ok')
     raise ApiError('not found', 404)
+
+
+@api.route("/channel-rules", methods=['GET'])
+@cross_origin()
+@permission(Scope.write_rules)
+@jsonp
+def get_channel_rules():
+    customer_id = request.args.get('customer_id')
+    if not customer_id or customer_id.strip() == "":
+        raise ApiError("'customer_id' query parameter is missing for the request", 400)
+    channel_rules = CustomerChannelRuleMap.get_channel_rules(customer_id)
+    return jsonify([c.serialize for c in channel_rules])
