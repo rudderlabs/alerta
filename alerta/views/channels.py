@@ -86,7 +86,10 @@ def delete_channel_by_id(channel_id):
     customer_id = request.args.get('customer_id')
     if not customer_id:
         raise ApiError('customer_id not present in query parameters', 400)
-    channel = CustomerChannel.delete_by_id(customer_id, channel_id)
+    try:
+        channel = CustomerChannel.delete_by_id(customer_id, channel_id)
+    except Exception as e:
+        raise ApiError(str(e), 400)
     if not channel:
         raise ApiError("not found", 404)
     return jsonify(status='ok')

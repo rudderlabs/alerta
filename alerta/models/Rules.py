@@ -146,4 +146,9 @@ class Rule:
 
     @staticmethod
     def delete_by_id(rule_id, customer_id):
-        return Rule.from_db(db.delete_by_id(rule_id, customer_id))
+        try:
+            return Rule.from_db(db.delete_by_id(rule_id, customer_id))
+        except Exception as e:
+            if 'violates foreign key constraint' in str(e):
+                raise Exception('cannot delete rule, rule has reference in channel-rule-map')
+            raise e

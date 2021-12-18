@@ -84,7 +84,10 @@ def delete_rule_by_rule_id(rule_id):
     customer_id = request.args.get('customer_id')
     if not customer_id:
         raise ApiError('customer_id not found in query params')
-    rule = Rule.delete_by_id(rule_id, customer_id)
+    try:
+        rule = Rule.delete_by_id(rule_id, customer_id)
+    except Exception as e:
+        raise ApiError(str(e), 400)
     if not rule:
         raise ApiError('not found', 404)
     return jsonify(status='ok')

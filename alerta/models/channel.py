@@ -85,7 +85,12 @@ class CustomerChannel:
 
     @staticmethod
     def delete_by_id(customer_id, channel_id):
-        return CustomerChannel.from_db(db.delete_channel_by_id(customer_id, channel_id))
+        try:
+            return CustomerChannel.from_db(db.delete_channel_by_id(customer_id, channel_id))
+        except Exception as e:
+            if 'violates foreign key constraint' in str(e):
+                raise Exception('cannot delete channel, channel has reference in channel-rule-map')
+            raise e
 
     @classmethod
     def parse(cls, json: JSON) -> 'CustomerChannel':
