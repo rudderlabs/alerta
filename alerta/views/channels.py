@@ -130,7 +130,7 @@ def link_channel_rule():
     return jsonify(status='ok')
 
 
-@api.route("/channel-rule/<channel_rule_map_id>", methods=['POST'])
+@api.route("/channel-rule/<channel_rule_map_id>", methods=['DELETE'])
 @cross_origin()
 @permission(Scope.write_rules)
 @jsonp
