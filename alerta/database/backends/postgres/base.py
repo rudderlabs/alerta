@@ -1741,10 +1741,10 @@ class Backend(Database):
 
     def create_event_log(self, event_log):
         query = f"""INSERT INTO event_log(event_name ,resource ,customer_id ,environment ,event_properties,channel_id) 
-        select %(event_name)s ,%(resource)s ,%(customer_id)s ,%(environment)s ,%(event_properties)s, id FROM 
-        customer_channels where customer_id = %(customer_id)s
-        RETURNING *
-        """
+                select %(event_name)s ,%(resource)s ,%(customer_id)s ,%(environment)s ,%(event_properties)s, id FROM 
+                customer_channels where customer_id = %(customer_id)s
+                RETURNING id
+                """
         return self._insert(query, vars(event_log))
 
     def health_check(self):
@@ -1757,3 +1757,10 @@ class Backend(Database):
             order by customer_channel_rules_map.id asc
         """
         return self._fetchall(query, {}, limit=limit, offset=offset)
+
+    def create_email_based_event_log(self, event_log):
+        query = f"""INSERT INTO event_log(event_name ,resource ,customer_id ,environment ,event_properties,channel_id) 
+                select %(event_name)s ,%(resource)s ,%(customer_id)s ,%(environment)s ,%(event_properties)s, 0
+                RETURNING id
+                """
+        return self._insert(query, vars(event_log))

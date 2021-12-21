@@ -5,16 +5,23 @@ from alerta.models.alert import Alert
 
 
 class EventLog:
-    def __init__(self, event_name, resource, customer_id, event_properties, environment, id=None):
+    def __init__(self, event_name, resource, customer_id, event_properties, environment, admin_email=None, id=None):
         self.id = id
         self.event_name = event_name
         self.resource = resource
         self.customer_id = customer_id
         self.event_properties = event_properties
         self.environment = environment
+        self.admin_email = admin_email
 
     def create(self):
-        return EventLog.from_db(db.create_event_log(self))
+        result = db.create_event_log(self)
+        if result is None and self.admin_email:
+            """
+            result will be None if no rows are inserted into event_log table
+            """
+            self.event_properties['admin_email'] = self.admin_email
+            db.create_email_based_event_log(self)
 
     @classmethod
     def from_db(cls, r: Union[Dict, Tuple]) -> 'EventLog':
@@ -33,4 +40,5 @@ class EventLog:
 
     @staticmethod
     def from_alert(alert: Alert):
-        return EventLog(alert.event, alert.resource, alert.customer, alert.properties, alert.environment)
+        return EventLog(alert.event, alert.resource, alert.customer, alert.properties, alert.environment,
+                        getattr(alert, 'admin_email', None))
