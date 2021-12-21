@@ -16,11 +16,7 @@ class EventLog:
 
     def create(self):
         result = db.create_event_log(self)
-        if result is None and self.admin_email:
-            """
-            result will be None if no rows are inserted into event_log table
-            """
-            self.event_properties['admin_email'] = self.admin_email
+        if result is None:
             db.create_email_based_event_log(self)
 
     @classmethod

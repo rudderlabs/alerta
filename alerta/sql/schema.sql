@@ -294,3 +294,5 @@ CREATE UNIQUE INDEX IF NOT EXISTS env_res_evt_cust_key ON alerts USING btree (en
 CREATE UNIQUE INDEX IF NOT EXISTS org_cust_key ON heartbeats USING btree (origin, (COALESCE(customer, ''::text)));
 
 CREATE UNIQUE INDEX IF NOT EXISTS event_name_resource_customer_id_channel_id ON worker_event_id_map USING btree (event_name,resource,customer_id,channel_id,environment);
+
+INSERT INTO CUSTOMER_CHANNELS(id) values(0) ON CONFLICT DO NOTHING;
