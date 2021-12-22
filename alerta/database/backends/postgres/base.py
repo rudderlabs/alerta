@@ -1773,9 +1773,7 @@ class Backend(Database):
 
     def create_system_added_channel(self, channel):
         query = f"""
-        insert into customer_channels(customer_id,name,channel_type,properties,system_added) 
-        select %(customer_id)s, %(name)s, %(channel_type)s, %(properties)s, true where not exists(
-            select id from customer_channels where customer_id=%(customer_id)s
-        ) returning id;
+        insert into customer_channels(customer_id,name,channel_type,properties,system_added)
+        values (%(customer_id)s, %(name)s, %(channel_type)s, %(properties)s, true) on conflict do nothing returning *;
         """
         return self._insert(query, vars(channel))

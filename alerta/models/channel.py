@@ -112,5 +112,4 @@ class CustomerChannel:
     def create_admin_email_channel(customer_id, email):
         channel = CustomerChannel('Email channel of admin', 'email', {'emails': [email]},
                                   customer_id)
-        result = db.create_system_added_channel(channel)
-        print("RESULT IS ", result)
+        db.create_system_added_channel(channel)
