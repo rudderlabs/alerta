@@ -59,7 +59,7 @@ def receive():
         alert = process_alert(alert)
     except RejectException as e:
         audit_trail_alert(event='alert-rejected')
-        raise ApiError(str(e), 403)
+        raise ApiError(str(e), 400)
     except RateLimit as e:
         audit_trail_alert(event='alert-rate-limited')
         return jsonify(status='error', message=str(e), id=alert.id), 429
@@ -74,7 +74,7 @@ def receive():
     except AlertaException as e:
         raise ApiError(e.message, code=e.code, errors=e.errors)
     except Exception as e:
-        raise ApiError(str(e), 500)
+        raise ApiError(str(e), 400)
     write_audit_trail.send(current_app._get_current_object(), event='alert-received', message=alert.text, user=g.login,
                            customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert', request=request)
     if not alert.repeat:

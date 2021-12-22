@@ -108,6 +108,9 @@ class Rule:
 
     @staticmethod
     def find_by_id(id: int, customer_id: str) -> Optional['Rule']:
+        value = db.get_customer_rules_count(customer_id)
+        if value.count == 0:
+            raise Exception(f'customer with id {customer_id} not found')
         return Rule.from_db(db.get_rule(id, customer_id))
 
     @staticmethod
@@ -134,7 +137,7 @@ class Rule:
     def update_by_id(rule_id, customer_id, rules=None, is_active=None, name=None):
         rule = Rule.find_by_id(rule_id, customer_id)
         if not rule:
-            raise Exception("not found")
+            raise Exception(f"rule with id {rule_id} not found")
         if isinstance(rules, list):
             rule.rules = rules
         if isinstance(is_active, bool):

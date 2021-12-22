@@ -1764,3 +1764,7 @@ class Backend(Database):
                 RETURNING id
                 """
         return self._insert(query, vars(event_log))
+
+    def get_customer_rules_count(self, customer_id):
+        query = f"""select count(*) from customer_rules where customer_id='{customer_id}'"""
+        return self._fetchone(query, {})
