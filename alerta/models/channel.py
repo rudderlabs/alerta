@@ -110,6 +110,6 @@ class CustomerChannel:
 
     @staticmethod
     def create_admin_email_channel(customer_id, email):
-        channel = CustomerChannel('Email channel of admin', 'email', {'emails': [email]},
+        channel = CustomerChannel('Email channel of the admin', 'email', {'emails': [email]},
                                   customer_id)
         db.create_system_added_channel(channel)

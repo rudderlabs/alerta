@@ -21,6 +21,7 @@ from alerta.utils.audit import write_audit_trail
 from alerta.utils.paging import Page
 from alerta.utils.response import absolute_url, jsonp
 
+from ..models.channel import CustomerChannel
 from . import api
 from ..models.channel_rule import CustomerChannelRuleMap
 from ..models.event_log import EventLog
@@ -78,6 +79,8 @@ def receive():
     write_audit_trail.send(current_app._get_current_object(), event='alert-received', message=alert.text, user=g.login,
                            customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert', request=request)
     if not alert.repeat:
+        if alert.customer and isinstance(alert.enriched_data, dict) and alert.enriched_data.get('admin_email'):
+            CustomerChannel.create_admin_email_channel(alert.customer, alert.enriched_data['admin_email'])
         EventLog.from_alert(alert).create()
     if alert:
         return jsonify(status='ok', id=alert.id, alert=alert.serialize), 201
