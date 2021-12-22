@@ -1707,12 +1707,14 @@ class Backend(Database):
         query = f"""select * from customer_channels where customer_id='{customer_id}' and id={channel_id}"""
         return self._fetchone(query, ())
 
-    def update_channel_by_id(self, customer_id, channel_id, name=None, properties=None):
+    def update_channel_by_id(self, customer_id, channel_id, name=None, properties=None, is_active=None):
         updated_list = []
         if isinstance(name, str):
             updated_list.append("name=%(name)s")
         if isinstance(properties, dict):
             updated_list.append("properties=%(properties)s")
+        if isinstance(is_active, bool):
+            updated_list.append("is_active=%(is_active)s")
         if len(updated_list) == 0:
             return
         query = f"""UPDATE customer_channels set {','.join(updated_list)} 
@@ -1742,7 +1744,7 @@ class Backend(Database):
     def create_event_log(self, event_log):
         query = f"""INSERT INTO event_log(event_name ,resource ,customer_id ,environment ,event_properties,channel_id) 
                 select %(event_name)s ,%(resource)s ,%(customer_id)s ,%(environment)s ,%(event_properties)s, id FROM 
-                customer_channels where customer_id = %(customer_id)s
+                customer_channels where customer_id = %(customer_id)s and is_active=true
                 RETURNING id
                 """
         return self._insert(query, vars(event_log))
@@ -1768,3 +1770,12 @@ class Backend(Database):
     def get_customer_rules_count(self, customer_id):
         query = f"""select count(*) from customer_rules where customer_id='{customer_id}'"""
         return self._fetchone(query, {})
+
+    def create_system_added_channel(self, channel):
+        query = f"""
+        insert into customer_channels(customer_id,name,channel_type,properties,system_added) 
+        select %(customer_id)s, %(name)s, %(channel_type)s, %(properties)s, true where not exists(
+            select id from customer_channels where customer_id=%(customer_id)s
+        ) returning id;
+        """
+        return self._insert(query, vars(channel))

@@ -296,3 +296,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS org_cust_key ON heartbeats USING btree (origin
 CREATE UNIQUE INDEX IF NOT EXISTS event_name_resource_customer_id_channel_id ON worker_event_id_map USING btree (event_name,resource,customer_id,channel_id,environment);
 
 INSERT INTO CUSTOMER_CHANNELS(id) values(0) ON CONFLICT DO NOTHING;
+delete from customer_channels where id=0;
+alter table if exists customer_channels add if not exists is_active boolean not null default true;
+alter table if exists customer_channels add if not exists system_added boolean not null default false;
+create unique index if not exists cust_channel_sys_added on customer_channels(customer_id) where system_added=true;

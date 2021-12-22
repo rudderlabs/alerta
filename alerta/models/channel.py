@@ -11,12 +11,13 @@ JSON = Dict[str, Any]
 class CustomerChannel:
     SUPPORTED_CHANNEL_TYPES = ["webhook", "email"]
 
-    def __init__(self, name, channel_type, properties, customer_id, id=None):
+    def __init__(self, name, channel_type, properties, customer_id, is_active=True, id=None):
         self.id = id
         self.name = name
         self.channel_type = channel_type
         self.properties = properties
         self.customer_id = customer_id
+        self.is_active = is_active
 
     def create(self):
         self.validate()
@@ -43,7 +44,7 @@ class CustomerChannel:
 
     @classmethod
     def from_record(cls, rec) -> 'CustomerChannel':
-        return CustomerChannel(rec.name, rec.channel_type, rec.properties, rec.customer_id, rec.id)
+        return CustomerChannel(rec.name, rec.channel_type, rec.properties, rec.customer_id, rec.is_active, rec.id)
 
     @classmethod
     def from_db(cls, r: Union[Dict, Tuple]) -> 'CustomerChannel':
@@ -59,7 +60,8 @@ class CustomerChannel:
             "name": self.name,
             "channel_type": self.channel_type,
             "properties": self.properties,
-            "customer_id": self.customer_id
+            "customer_id": self.customer_id,
+            "is_active": self.is_active,
         }
 
     @staticmethod
@@ -72,7 +74,7 @@ class CustomerChannel:
         return CustomerChannel.from_db(db.find_channel_by_id(customer_id, channel_id))
 
     @staticmethod
-    def update_by_id(customer_id, channel_id, name=None, properties=None, **kwargs):
+    def update_by_id(customer_id, channel_id, name=None, properties=None, is_active=None, **kwargs):
         customer_channel = CustomerChannel.find_by_id(customer_id, channel_id)
         if not customer_channel:
             raise Exception("not found")
@@ -80,8 +82,10 @@ class CustomerChannel:
             customer_channel.name = name
         if properties:
             customer_channel.properties = properties
+        if isinstance(is_active, bool):
+            customer_channel.is_active = is_active
         customer_channel.validate()
-        return CustomerChannel.from_db(db.update_channel_by_id(customer_id, channel_id, name, properties))
+        return CustomerChannel.from_db(db.update_channel_by_id(customer_id, channel_id, name, properties, is_active))
 
     @staticmethod
     def delete_by_id(customer_id, channel_id):
@@ -103,3 +107,10 @@ class CustomerChannel:
         if not isinstance(json.get('customer_id'), str) or json.get('customer_id').strip() == "":
             raise Exception("customer_id is required, it must be a string")
         return CustomerChannel(**json)
+
+    @staticmethod
+    def create_admin_email_channel(customer_id, email):
+        channel = CustomerChannel('Email channel of admin', 'email', {'emails': [email]},
+                                  customer_id)
+        result = db.create_system_added_channel(channel)
+        print("RESULT IS ", result)
