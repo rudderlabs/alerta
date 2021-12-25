@@ -213,7 +213,8 @@ class Backend(Database):
                    timeout=%(timeout)s, raw_data=%(raw_data)s, repeat=%(repeat)s,
                    last_receive_id=%(last_receive_id)s, last_receive_time=%(last_receive_time)s,
                    tags=ARRAY(SELECT DISTINCT UNNEST(tags || %(tags)s)), attributes=attributes || %(attributes)s,
-                   duplicate_count=duplicate_count + 1, {update_time}, history=(%(history)s || history)[1:{limit}]
+                   duplicate_count=duplicate_count + 1, {update_time}, history=(%(history)s || history)[1:{limit}],
+                   enriched_data=%(enriched_data)s
              WHERE environment=%(environment)s
                AND resource=%(resource)s
                AND event=%(event)s
@@ -236,7 +237,8 @@ class Backend(Database):
                    duplicate_count=%(duplicate_count)s, repeat=%(repeat)s, previous_severity=%(previous_severity)s,
                    trend_indication=%(trend_indication)s, receive_time=%(receive_time)s, last_receive_id=%(last_receive_id)s,
                    last_receive_time=%(last_receive_time)s, tags=ARRAY(SELECT DISTINCT UNNEST(tags || %(tags)s)),
-                   attributes=attributes || %(attributes)s, {update_time}, history=(%(history)s || history)[1:{limit}]
+                   attributes=attributes || %(attributes)s, {update_time}, history=(%(history)s || history)[1:{limit}],
+                   enriched_data=%(enriched_data)s
              WHERE environment=%(environment)s
                AND resource=%(resource)s
                AND ((event=%(event)s AND severity!=%(severity)s) OR (event!=%(event)s AND %(event)s=ANY(correlate)))
