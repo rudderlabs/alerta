@@ -27,9 +27,9 @@ def create_customer_alert_forward_rule():
 @cross_origin()
 @permission(Scope.read_rules)
 def get_customer_rules():
-    customer_id = request.args.get('customer_id')
+    customer_id = request.args.get('customer_id', '').strip()
     if not customer_id:
-        raise ApiError("customer_id is not present in query parameters")
+        raise ApiError("customer_id is not present in query parameters", 400)
     sort_by = request.args.get('sort_by', 'id')
     limit = int(request.args.get('limit', 10))
     offset = int(request.args.get('offset', 0))
