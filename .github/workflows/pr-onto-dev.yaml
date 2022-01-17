@@ -1,4 +1,4 @@
-name: Check for existing tags from package.json
+name: Pull Request Onto Develop
 on:
   pull_request:
     branches:
