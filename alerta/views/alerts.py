@@ -48,8 +48,8 @@ count_timer = Timer('alerts', 'counts', 'Count alerts', 'Total time and number o
 def receive():
     try:
         with StatsD.stats_client.timer('request_parse_time'):
-            logging.getLogger('').info('Alert Payload [%s]', request.json)
-            logging.getLogger('').info(json.dumps(
+            logging.getLogger('alerta').info('Alert Payload [%s]', request.json)
+            logging.getLogger('alerta').info(json.dumps(
                 request.json,
                 sort_keys=True,
                 indent=4,
