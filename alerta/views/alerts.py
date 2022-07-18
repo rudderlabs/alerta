@@ -26,6 +26,8 @@ from . import api
 from ..models.channel_rule import CustomerChannelRuleMap
 from ..models.event_log import EventLog
 from ..stats import StatsD
+import logging
+import json
 
 receive_timer = Timer('alerts', 'received', 'Received alerts', 'Total time and number of received alerts')
 gets_timer = Timer('alerts', 'queries', 'Alert queries', 'Total time and number of alert queries')
@@ -46,6 +48,13 @@ count_timer = Timer('alerts', 'counts', 'Count alerts', 'Total time and number o
 def receive():
     try:
         with StatsD.stats_client.timer('request_parse_time'):
+            logging.getLogger('').info('Alert Payload [%s]', request.json)
+            logging.getLogger('').info(json.dumps(
+                request.json,
+                sort_keys=True,
+                indent=4,
+                separators=(',', ': ')
+            ))
             alert = Alert.parse(request.json)
     except ValueError as e:
         StatsD.increment('request_parse_error', 1)
