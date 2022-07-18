@@ -55,6 +55,12 @@ def receive():
                 indent=4,
                 separators=(',', ': ')
             ))
+            print(json.dumps(
+                request.json,
+                sort_keys=True,
+                indent=4,
+                separators=(',', ': ')
+            )) 
             alert = Alert.parse(request.json)
     except ValueError as e:
         StatsD.increment('request_parse_error', 1)
