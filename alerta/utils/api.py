@@ -50,6 +50,37 @@ def process_alert(alert: Alert) -> Alert:
     return alert
 
 
+def enrich_alert(alert: Alert) -> Alert:
+    try:
+        wanted_plugins, wanted_config = plugins.routing(alert)
+        with StatsD.stats_client.timer("enrichment_process_time"):
+            for plugin in wanted_plugins:
+                try:
+                    # TODO: remove check for repeated alert once we stop making calls to encrichment api for such alerts
+                    if alert.repeat:
+                        logging.debug('RudderEnrichment: skipping enrichment for repeated alert')
+                        return alert
+                    logging.debug('RudderEnrichment: enrich_alert %s', alert)
+                    # TODO: do not populate enriched_data field, instead all the metadata that we retrieved to the alert
+                    # the end user message will be created later by the processor
+                    alert = plugin.enrich_alert(alert)
+                    StatsD.increment("enrichment_process_count", 1, {"name": plugin.name})
+                except (RejectException, HeartbeatReceived, BlackoutPeriod, RateLimit, ForwardingLoop, AlertaException):
+                    StatsD.increment("enrichment_process_error", 1, {"name": plugin.name})
+                    raise
+                except Exception as e:
+                    StatsD.increment("enrichment_process_error", 1, {"name": plugin.name})
+                    if current_app.config['PLUGINS_RAISE_ON_ERROR']:
+                        raise RuntimeError(f"RudderEnrichment: Error while enriching alert '{plugin.name}': {str(e)}")
+                    else:
+                        logging.error(f"RudderEnrichment: Error while enriching alert '{plugin.name}': {str(e)}")
+                if not alert:
+                    raise SyntaxError(f"RudderEnrichment: Failed to enrich alert: enrich_alert did not return modified alert")
+    except Exception as e:
+        raise ApiError(str(e))
+    return alert
+
+
 def process_action(alert: Alert, action: str, text: str, timeout: int = None) -> Tuple[Alert, str, str, Optional[int]]:
     wanted_plugins, wanted_config = plugins.routing(alert)
 
