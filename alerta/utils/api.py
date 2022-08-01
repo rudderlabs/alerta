@@ -61,7 +61,7 @@ def enrich_alert(alert: Alert) -> Alert:
                         logging.debug('RudderEnrichment: skipping enrichment for repeated alert')
                         return alert
                     logging.debug('RudderEnrichment: enrich_alert %s', alert)
-                    # TODO: do not populate enriched_data field, instead all the metadata that we retrieved to the alert
+                    # TODO: do not populate enriched_data field, instead add all the metadata that we retrieved to the alert
                     # the end user message will be created later by the processor
                     alert = plugin.enrich_alert(alert)
                     StatsD.increment("enrichment_process_count", 1, {"name": plugin.name})
