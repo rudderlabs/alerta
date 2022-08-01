@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS alerts (
     receive_time timestamp without time zone,
     last_receive_id text,
     last_receive_time timestamp without time zone,
-    history history[]
+    history history[],
+    worker_id varchar(100)
 );
 
 DO $$
