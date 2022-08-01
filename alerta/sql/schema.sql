@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS alerts (
 
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_id" varchar(100);
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_status" varchar(50);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "last_claim_time" timestamp without time zone;
+CREATE INDEX IF NOT EXISTS "workerstatus_createtime_idx" ON "public"."alerts"("worker_status","create_time");
 
 DO $$
 BEGIN
