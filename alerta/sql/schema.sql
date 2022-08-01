@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS alerts (
 );
 
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_id" varchar(100);
-ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "status" varchar(50);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_status" varchar(50);
 
 DO $$
 BEGIN
