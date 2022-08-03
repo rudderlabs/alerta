@@ -80,6 +80,9 @@ class Alert:
         self.enriched_data = kwargs.get('enriched_data', None)
         self.properties = kwargs.get('properties', None)
 
+        # setting worker status to waiting by default
+        self.worker_status = 'waiting'
+
     @classmethod
     def parse(cls, json: JSON) -> 'Alert':
         if not isinstance(json.get('correlate', []), list):
