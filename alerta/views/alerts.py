@@ -127,7 +127,7 @@ def enrichAlert():
     write_audit_trail.send(current_app._get_current_object(), event='alert-received', message=alert.text, user=g.login,
                            customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert', request=request)
     if alert:
-        return jsonify(status='ok', id=alert.id, alert=alert.serialize), 201
+        return jsonify(status='ok', id=alert.id, alert=alert.serialize), 200
     else:
         raise ApiError('alert enrichment failed', 500)
 
