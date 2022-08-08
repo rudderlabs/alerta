@@ -65,6 +65,8 @@ ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_error" varchar(512);
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_retry_count" integer default 0;
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_next_retry_time" timestamp without time zone;
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "last_claim_time" timestamp without time zone;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "rudder_resource_type" varchar(100);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "rudder_resource_id" varchar(100);
 CREATE INDEX IF NOT EXISTS "workerstatus_createtime_idx" ON "public"."alerts"("worker_status","create_time");
 
 DO $$
