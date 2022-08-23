@@ -71,7 +71,7 @@ def enrich_alert(alert: Alert) -> Alert:
                 except Exception as e:
                     StatsD.increment("enrichment_process_error", 1, {"name": plugin.name})
                     if current_app.config['PLUGINS_RAISE_ON_ERROR']:
-                        raise RuntimeError(f"RudderEnrichment: Error while enriching alert '{plugin.name}': {str(e)}")
+                        raise RuntimeError(f"RudderEnrichment: Error while enriching alert {alert.id} - {str(e)}")
                     else:
                         logging.error(f"RudderEnrichment: Error while enriching alert '{plugin.name}': {str(e)}")
                 if not alert:
