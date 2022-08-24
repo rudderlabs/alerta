@@ -69,6 +69,8 @@ ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "rudder_resource_type" varchar(100);
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "rudder_resource_id" varchar(100);
 CREATE INDEX IF NOT EXISTS "workerstatus_createtime_idx" ON "public"."alerts"("worker_status","create_time");
 
+ALTER TABLE "public"."event_log" DROP CONSTRAINT "event_log_channel_id_fkey";
+
 DO $$
 BEGIN
     ALTER TABLE alerts ADD COLUMN update_time timestamp without time zone;
