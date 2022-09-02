@@ -171,6 +171,8 @@ class Backend(Database):
                AND resource=%(resource)s
                AND event=%(event)s
                AND severity=%(severity)s
+               AND rudder_resource_type=%(rudder_resource_type)s
+               AND rudder_resource_id=%(rudder_resource_id)s
                AND {customer}
             """.format(customer='customer=%(customer)s' if alert.customer else 'customer IS NULL')
         return self._fetchone(select, vars(alert))
