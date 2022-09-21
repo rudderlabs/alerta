@@ -26,6 +26,8 @@ from . import api
 from ..models.channel_rule import CustomerChannelRuleMap
 from ..models.event_log import EventLog
 from ..stats import StatsD
+import logging
+import json
 
 receive_timer = Timer('alerts', 'received', 'Received alerts', 'Total time and number of received alerts')
 gets_timer = Timer('alerts', 'queries', 'Alert queries', 'Total time and number of alert queries')
@@ -57,6 +59,19 @@ def handle_resource_in_alert_for_backwards_compatibility(alert):
 def receive():
     try:
         with StatsD.stats_client.timer('request_parse_time'):
+            logging.getLogger('alerta').info('Alert Payload [%s]', request.json)
+            logging.getLogger('alerta').info(json.dumps(
+                request.json,
+                sort_keys=True,
+                indent=4,
+                separators=(',', ': ')
+            ))
+            print(json.dumps(
+                request.json,
+                sort_keys=True,
+                indent=4,
+                separators=(',', ': ')
+            )) 
             alert = Alert.parse(request.json)
             alert = handle_resource_in_alert_for_backwards_compatibility(alert=alert)
     except ValueError as e:
