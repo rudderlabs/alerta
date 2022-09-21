@@ -22,7 +22,7 @@ NoneType = type(None)
 
 
 sources_search_words = ['sourceID=', 'sourceId=', 'source-id=']
-destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=']
+destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
 
 resourceTypeToSearchWordsMap = {
