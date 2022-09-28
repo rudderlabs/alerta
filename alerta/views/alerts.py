@@ -37,6 +37,13 @@ attrs_timer = Timer('alerts', 'attributes', 'Alert attributes change',
 delete_timer = Timer('alerts', 'deleted', 'Deleted alerts', 'Total time and number of deleted alerts')
 count_timer = Timer('alerts', 'counts', 'Count alerts', 'Total time and number of count queries')
 
+def handle_resource_in_alert_for_forward_compatibility(alert):
+    if alert.resource == 'warehouse-upload-aborted':
+        alert.resource = 'upload_aborted'
+    elif alert.resource == 'ut-errors':
+        alert.resource = 'proc_num_ut_output_failed_events'
+    return alert
+
 
 @api.route('/alert', methods=['OPTIONS', 'POST'])
 @cross_origin()
@@ -47,6 +54,7 @@ def receive():
     try:
         with StatsD.stats_client.timer('request_parse_time'):
             alert = Alert.parse(request.json)
+            alert = handle_resource_in_alert_for_forward_compatibility(alert=alert)
     except ValueError as e:
         StatsD.increment('request_parse_error', 1)
         raise ApiError(str(e), 400)
