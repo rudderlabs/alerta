@@ -15,7 +15,7 @@ from alerta.models.enums import Scope
 from alerta.models.metrics import Timer, timer
 from alerta.models.note import Note
 from alerta.models.switch import Switch
-from alerta.utils.api import (assign_customer, process_action, process_alert,
+from alerta.utils.api import (assign_customer, enrich_alert, process_action, process_alert,
                               process_delete, process_note, process_status, )
 from alerta.utils.audit import write_audit_trail
 from alerta.utils.paging import Page
@@ -37,11 +37,14 @@ attrs_timer = Timer('alerts', 'attributes', 'Alert attributes change',
 delete_timer = Timer('alerts', 'deleted', 'Deleted alerts', 'Total time and number of deleted alerts')
 count_timer = Timer('alerts', 'counts', 'Count alerts', 'Total time and number of count queries')
 
-def handle_resource_in_alert_for_forward_compatibility(alert):
-    if alert.resource == 'warehouse-upload-aborted':
-        alert.resource = 'upload_aborted'
-    elif alert.resource == 'ut-errors':
-        alert.resource = 'proc_num_ut_output_failed_events'
+
+def handle_resource_in_alert_for_backwards_compatibility(alert):
+    if alert.resource == 'upload_aborted':
+        alert.resource = 'warehouse-upload-aborted'
+    elif alert.resource == 'proc_num_ut_output_failed_events':
+        alert.resource = 'ut-errors'
+    elif alert.resource == 'warehouse_load_table_column_count':
+        alert.resource = 'warehouse-load-table-column-count'
     return alert
 
 
@@ -54,7 +57,7 @@ def receive():
     try:
         with StatsD.stats_client.timer('request_parse_time'):
             alert = Alert.parse(request.json)
-            alert = handle_resource_in_alert_for_forward_compatibility(alert=alert)
+            alert = handle_resource_in_alert_for_backwards_compatibility(alert=alert)
     except ValueError as e:
         StatsD.increment('request_parse_error', 1)
         raise ApiError(str(e), 400)
@@ -86,14 +89,58 @@ def receive():
         raise ApiError(str(e), 400)
     write_audit_trail.send(current_app._get_current_object(), event='alert-received', message=alert.text, user=g.login,
                            customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert', request=request)
-    if not alert.repeat:
-        if alert.customer and isinstance(alert.enriched_data, dict) and alert.enriched_data.get('admin_email'):
-            CustomerChannel.create_admin_email_channel(alert.customer, alert.enriched_data['admin_email'])
-        EventLog.from_alert(alert).create()
     if alert:
         return jsonify(status='ok', id=alert.id, alert=alert.serialize), 201
     else:
         raise ApiError('insert or update of received alert failed', 500)
+
+
+# TODO: do not call /erichAlert if the alert is suppressed/repeated
+@api.route('/enrichAlert', methods=['OPTIONS', 'POST'])
+@cross_origin()
+@permission(Scope.write_alerts)
+@timer(receive_timer)
+@jsonp
+def enrichAlert():
+    try:
+        with StatsD.stats_client.timer('request_parse_time'):
+            alert = Alert.parse(request.json)
+    except ValueError as e:
+        StatsD.increment('request_parse_error', 1)
+        raise ApiError(str(e), 400)
+
+    def audit_trail_alert(event: str):
+        write_audit_trail.send(current_app._get_current_object(), event=event, message=alert.text, user=g.login,
+                               customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert',
+                               request=request)
+
+    # TODO: modify exceptions and logs as needed
+    try:
+        alert = enrich_alert(alert)
+    except RejectException as e:
+        audit_trail_alert(event='alert-rejected')
+        raise ApiError(str(e), 400)
+    except RateLimit as e:
+        audit_trail_alert(event='alert-rate-limited')
+        return jsonify(status='error', message=str(e), id=alert.id), 429
+    except HeartbeatReceived as heartbeat:
+        audit_trail_alert(event='alert-heartbeat')
+        return jsonify(status='ok', message=str(heartbeat), id=heartbeat.id), 202
+    except BlackoutPeriod as e:
+        audit_trail_alert(event='alert-blackout')
+        return jsonify(status='ok', message=str(e), id=alert.id), 202
+    except ForwardingLoop as e:
+        return jsonify(status='ok', message=str(e)), 202
+    except AlertaException as e:
+        raise ApiError(e.message, code=e.code, errors=e.errors)
+    except Exception as e:
+        raise ApiError(str(e), 400)
+    write_audit_trail.send(current_app._get_current_object(), event='alert-received', message=alert.text, user=g.login,
+                           customers=g.customers, scopes=g.scopes, resource_id=alert.id, type='alert', request=request)
+    if alert:
+        return jsonify(status='ok', id=alert.id, alert=alert.serialize), 200
+    else:
+        raise ApiError('alert enrichment failed', 500)
 
 
 @api.route('/alert/<alert_id>', methods=['OPTIONS', 'GET'])

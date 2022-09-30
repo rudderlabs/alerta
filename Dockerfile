@@ -66,6 +66,7 @@ RUN /app/install-plugins.sh
 ADD rudder-alerta-enrichment-plugin/ /opt/rudder-alerta-enrichment-plugin/
 # RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/pip install -r requirements.txt && mv rudder_enrichment /venv/lib/python3.7/site-packages/ && rm -rf /opt/rudder-alerta-enrichment-plugin/
 RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/python setup.py install
+ENV DITTO_JSON_PATH=/opt/rudder-alerta-enrichment-plugin/ditto/text.json
 
 
 ENV ALERTA_SVR_CONF_FILE /app/alertad.conf
@@ -110,6 +111,7 @@ ARG RUDDER_CONFIG_BACKEND_ADMIN_PASSWORD
 ARG RUDDER_CONFIG_BACKEND_DATA_CACHE_TTL
 ARG RUDDER_CONFIG_BACKEND_CACHE_STORE_MAX_SIZE
 ARG RUDDER_WEB_APP_URL_PREFIX
+ARG DITTO_JSON_PATH
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 8080

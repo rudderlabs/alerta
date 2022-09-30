@@ -59,6 +59,16 @@ CREATE TABLE IF NOT EXISTS alerts (
     history history[]
 );
 
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_id" varchar(100);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_status" varchar(50);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_error" varchar(512);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_retry_count" integer default 0;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "worker_next_retry_time" timestamp without time zone;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "last_claim_time" timestamp without time zone;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "rudder_resource_type" varchar(100);
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS "rudder_resource_id" varchar(100);
+CREATE INDEX IF NOT EXISTS "workerstatus_createtime_idx" ON "public"."alerts"("worker_status","create_time");
+
 DO $$
 BEGIN
     ALTER TABLE alerts ADD COLUMN update_time timestamp without time zone;
@@ -264,6 +274,8 @@ CREATE TABLE IF NOT EXISTS event_log(
     FOREIGN KEY(channel_id) REFERENCES customer_channels(id)
 );
 
+ALTER TABLE "public"."event_log" DROP CONSTRAINT IF EXISTS "event_log_channel_id_fkey";
+ALTER TABLE "public"."event_log" ADD COLUMN IF NOT EXISTS "channel_data" jsonb;
 
 CREATE TABLE IF NOT EXISTS worker_event_id_map(
     id SERIAL PRIMARY KEY,
@@ -288,7 +300,9 @@ CREATE TABLE IF NOT EXISTS worker_failed_deliveries(
 
 ALTER TABLE IF EXISTS alerts add if not exists enriched_data jsonb;
 
-CREATE UNIQUE INDEX IF NOT EXISTS env_res_evt_cust_key ON alerts USING btree (environment, resource, event, (COALESCE(customer, ''::text)));
+-- CREATE UNIQUE INDEX IF NOT EXISTS env_res_evt_cust_key ON alerts USING btree (environment, resource, event, (COALESCE(customer, ''::text)));
+DROP INDEX IF EXISTS env_res_evt_cust_key;
+CREATE UNIQUE INDEX IF NOT EXISTS env_res_evt_cust_resid_restype_key ON alerts USING btree (environment, resource, event, (COALESCE(customer, ''::text)), rudder_resource_type, rudder_resource_id);
 
 
 CREATE UNIQUE INDEX IF NOT EXISTS org_cust_key ON heartbeats USING btree (origin, (COALESCE(customer, ''::text)));
