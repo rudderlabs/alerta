@@ -38,7 +38,6 @@ delete_timer = Timer('alerts', 'deleted', 'Deleted alerts', 'Total time and numb
 count_timer = Timer('alerts', 'counts', 'Count alerts', 'Total time and number of count queries')
 
 
-
 def handle_resource_in_alert_for_backwards_compatibility(alert):
     if alert.resource == 'upload_aborted':
         alert.resource = 'warehouse-upload-aborted'
