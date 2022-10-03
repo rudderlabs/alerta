@@ -21,6 +21,33 @@ JSON = Dict[str, Any]
 NoneType = type(None)
 
 
+sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=']
+destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=']
+transformation_search_words = ['transformationId=', 'transformation_id=']
+
+resourceTypeToSearchWordsMap = {
+    "source": sources_search_words,
+    "destination": destinations_search_words,
+    "transformation": transformation_search_words
+}
+
+def get_matched_tag_value(tags: list, search_words: list):
+    for tag in tags:
+        for search_word in search_words:
+            if tag.startswith(search_word):
+                return tag.replace(search_word, '')
+
+def get_rudder_resource_from_tags(tags):
+    rudder_resource_type = None
+    rudder_resource_id = None
+    for resourceType in resourceTypeToSearchWordsMap:
+        resourceId = get_matched_tag_value(tags, resourceTypeToSearchWordsMap[resourceType])
+        if resourceId is not None:
+            rudder_resource_type = resourceType
+            rudder_resource_id = resourceId
+            break
+    return rudder_resource_type, rudder_resource_id
+
 class Alert:
 
     def __init__(self, resource: str, event: str, **kwargs) -> None:
@@ -80,6 +107,11 @@ class Alert:
         self.enriched_data = kwargs.get('enriched_data', None)
         self.properties = kwargs.get('properties', None)
 
+        # setting worker status to waiting by default
+        self.worker_status = 'waiting'
+        self.rudder_resource_type = kwargs.get('rudder_resource_type', None)
+        self.rudder_resource_id = kwargs.get('rudder_resource_id', None)
+
     @classmethod
     def parse(cls, json: JSON) -> 'Alert':
         if not isinstance(json.get('correlate', []), list):
@@ -94,6 +126,13 @@ class Alert:
             raise ValueError('timeout must be an integer')
         if json.get('customer', None) == '':
             raise ValueError('customer must not be an empty string')
+        rudder_resource_type = json.get('rudder_resource_type')
+        rudder_resource_id = json.get('rudder_resource_id')
+        tags = json.get('tags', list())
+        if rudder_resource_type is None or rudder_resource_id is None:
+            rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
+            if rudder_resource_type is None or rudder_resource_id is None:
+                raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
 
         return Alert(
             id=json.get('id', None),
@@ -107,7 +146,7 @@ class Alert:
             group=json.get('group', None),
             value=json.get('value', None),
             text=json.get('text', None),
-            tags=json.get('tags', list()),
+            tags=tags,
             attributes=json.get('attributes', dict()),
             origin=json.get('origin', None),
             event_type=json.get('type', None),
@@ -117,6 +156,8 @@ class Alert:
             customer=json.get('customer', None),
             enriched_data=json.get('enriched_data', None),
             properties=json.get('properties', None),
+            rudder_resource_type=rudder_resource_type,
+            rudder_resource_id=rudder_resource_id,
         )
 
     @property
@@ -153,6 +194,8 @@ class Alert:
             'history': [h.serialize for h in sorted(self.history, key=lambda x: x.update_time)],
             'enriched_data': self.enriched_data,
             'properties': self.properties,
+            'rudder_resource_type': self.rudder_resource_type,
+            'rudder_resource_id': self.rudder_resource_id
         }
 
     @property
@@ -186,7 +229,9 @@ class Alert:
             'lastReceiveTime': self.last_receive_time.isoformat(),
             'updateTime': self.update_time.isoformat(),
             'enriched_data': self.enriched_data,
-            'properties': self.properties
+            'properties': self.properties,
+            'rudder_resource_type': self.rudder_resource_type,
+            'rudder_resource_id': self.rudder_resource_id
         }
 
     def get_id(self, short: bool = False) -> str:
@@ -209,6 +254,13 @@ class Alert:
 
     @classmethod
     def from_document(cls, doc: Dict[str, Any]) -> 'Alert':
+        rudder_resource_type=doc.get('rudder_resource_type', None)
+        rudder_resource_id=doc.get('rudder_resource_id', None)
+        tags=doc.get('tags', list())
+        if rudder_resource_type is None or rudder_resource_id is None:
+            rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
+            if rudder_resource_type is None or rudder_resource_id is None:
+                raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
         return Alert(
             id=doc.get('id', None) or doc.get('_id'),
             resource=doc.get('resource', None),
@@ -221,7 +273,7 @@ class Alert:
             group=doc.get('group', None),
             value=doc.get('value', None),
             text=doc.get('text', None),
-            tags=doc.get('tags', list()),
+            tags=tags,
             attributes=doc.get('attributes', dict()),
             origin=doc.get('origin', None),
             event_type=doc.get('type', None),
@@ -240,6 +292,8 @@ class Alert:
             history=[History.from_db(h) for h in doc.get('history', list())],
             enriched_data=doc.get('enriched_data', None),
             properties=doc.get('properties', None),
+            rudder_resource_type=rudder_resource_type,
+            rudder_resource_id=rudder_resource_id
         )
 
     @classmethod
@@ -252,6 +306,21 @@ class Alert:
             alert_properties = rec.properties
         except AttributeError as e:
             alert_properties = None
+        try:
+            rudder_resource_type = rec.rudder_resource_type
+        except AttributeError as e:
+            rudder_resource_type = None
+        try:
+            rudder_resource_id = rec.rudder_resource_id
+        except AttributeError as e:
+            rudder_resource_id = None
+
+        tags=rec.tags
+        if rudder_resource_type is None or rudder_resource_id is None:
+            rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
+            if rudder_resource_type is None or rudder_resource_id is None:
+                raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
+        
         return Alert(
             id=rec.id,
             resource=rec.resource,
@@ -264,7 +333,7 @@ class Alert:
             group=rec.group,
             value=rec.value,
             text=rec.text,
-            tags=rec.tags,
+            tags=tags,
             attributes=dict(rec.attributes),
             origin=rec.origin,
             event_type=rec.type,
@@ -283,6 +352,8 @@ class Alert:
             history=[History.from_db(h) for h in rec.history],
             enriched_data=enriched_data,
             properties=alert_properties,
+            rudder_resource_type=rudder_resource_type,
+            rudder_resource_id=rudder_resource_id
         )
 
     @classmethod
