@@ -149,7 +149,7 @@ def housekeeping():
     info_threshold_hrs = request.args.get('info', type=int)
 
     if expired_threshold_hrs:
-        expired_threshold = expired_threshold_hrs * 60 * 60  # convert hours to seconds
+        expired_threshold = expired_threshold_hrs * 60  # convert hours to seconds
     else:
         expired_threshold = current_app.config['DELETE_EXPIRED_AFTER']  # seconds
 
