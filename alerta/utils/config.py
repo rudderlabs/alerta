@@ -80,7 +80,7 @@ class Config:
             os.environ.get('DEFAULT_EXPIRED_DELETE_HRS', None)
             or os.environ.get('HK_EXPIRED_DELETE_HRS', None)
         )
-        delete_expired = delete_expired_hrs * 60 * 60 if delete_expired_hrs else None
+        delete_expired = delete_expired_hrs * 60 if delete_expired_hrs else None
         config['DELETE_EXPIRED_AFTER'] = get_config('DELETE_EXPIRED_AFTER', default=delete_expired, type=int, config=config)
 
         delete_info_hrs = (

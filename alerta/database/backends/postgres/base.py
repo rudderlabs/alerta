@@ -1517,7 +1517,7 @@ class Backend(Database):
             delete = """
                 DELETE FROM alerts
                  WHERE (status IN ('closed', 'expired')
-                        AND last_receive_time < (NOW() at time zone 'utc' - INTERVAL '%(expired_threshold)s seconds'))
+                        AND receive_time < (NOW() at time zone 'utc' - INTERVAL '%(expired_threshold)s seconds'))
             """
             self._deleteall(delete, {'expired_threshold': expired_threshold})
 
@@ -1525,7 +1525,7 @@ class Backend(Database):
             delete = """
                 DELETE FROM alerts
                  WHERE (severity='informational'
-                        AND last_receive_time < (NOW() at time zone 'utc' - INTERVAL '%(info_threshold)s seconds'))
+                        AND receive_time < (NOW() at time zone 'utc' - INTERVAL '%(info_threshold)s seconds'))
             """
             self._deleteall(delete, {'info_threshold': info_threshold})
 
@@ -1534,7 +1534,7 @@ class Backend(Database):
             SELECT *
               FROM alerts
              WHERE status NOT IN ('expired') AND COALESCE(timeout, {timeout})!=0
-               AND (last_receive_time + INTERVAL '1 second' * timeout) < NOW() at time zone 'utc'
+               AND (receive_time + INTERVAL '1 second' * timeout) < NOW() at time zone 'utc'
         """.format(timeout=current_app.config['ALERT_TIMEOUT'])
 
         return self._fetchall(select, {})
