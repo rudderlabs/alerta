@@ -1508,7 +1508,7 @@ class Backend(Database):
         return self._upsert(upsert, vars(timer))
 
     # HOUSEKEEPING
-
+    # RS: Use first occurence of alert for housekeeping. Changing this from alerta's default behaviour
     def get_expired(self, expired_threshold, info_threshold):
         # delete 'closed' or 'expired' alerts older than "expired_threshold" seconds
         # and 'informational' alerts older than "info_threshold" seconds
