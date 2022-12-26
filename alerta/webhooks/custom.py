@@ -12,13 +12,15 @@ from alerta.utils.api import assign_customer, process_alert
 from alerta.utils.audit import write_audit_trail
 
 from . import webhooks
-
+import logging
 
 @webhooks.route('/webhooks/<webhook>', defaults={'path': ''}, methods=['OPTIONS', 'GET', 'POST'])
 @webhooks.route('/webhooks/<webhook>/<path:path>', methods=['OPTIONS', 'GET', 'POST'])
 @cross_origin()
 @permission(Scope.write_webhooks)
 def custom(webhook, path):
+    reqPayload = request.get_json() or request.form or request.get_data(as_text=True)
+    logging.info("TEST PROMETHEUS PAYLOAD: " + reqPayload)
     if webhook not in custom_webhooks.webhooks:
         raise ApiError(f"Custom webhook '{webhook}' not found.", 404)
 
