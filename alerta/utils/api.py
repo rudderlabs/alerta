@@ -15,7 +15,7 @@ from alerta.utils.rule_processor import process_forward_rules_for_alert
 from alerta.exceptions import (AlertaException, ApiError, BlackoutPeriod,
                                ForwardingLoop, HeartbeatReceived,
                                InvalidAction, RateLimit, RejectException)
-
+from alerta.helpers.prometheus_middleware import ALERT_COUNTER
 
 def assign_customer(wanted: str = None, permission: Scope = Scope.admin_alerts) -> Optional[str]:
     customers = g.get('customers', [])
@@ -36,6 +36,7 @@ def assign_customer(wanted: str = None, permission: Scope = Scope.admin_alerts) 
 
 def process_alert(alert: Alert) -> Alert:
     try:
+        is_correlated = False
         is_duplicate = alert.is_duplicate()
         if is_duplicate:
             alert = alert.deduplicate(is_duplicate)
@@ -45,6 +46,12 @@ def process_alert(alert: Alert) -> Alert:
                 alert = alert.update(is_correlated)
             else:
                 alert = alert.create()
+
+        ALERT_COUNTER.labels(alert.resource, alert.environment,
+            alert.rudder_resource_type, alert.rudder_resource_id,
+            'true' if is_duplicate else 'false',
+            'true' if is_correlated else 'false').inc()
+
     except Exception as e:
         raise ApiError(str(e))
     return alert
