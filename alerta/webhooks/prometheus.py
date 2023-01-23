@@ -8,6 +8,7 @@ from alerta.exceptions import ApiError
 from alerta.models.alert import Alert
 
 from . import WebhookBase
+from alerta.models.alert import get_rudder_resource_from_tags
 
 JSON = Dict[str, Any]
 dt = datetime.datetime
@@ -43,7 +44,7 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
         severity = 'unknown'
 
     # labels
-    resource = labels.pop('exported_instance', None) or labels.pop('instance', 'n/a')
+    resource = labels.pop('resource', None) or labels.pop('alertname')
     event = labels.pop('event', None) or labels.pop('alertname')
     environment = labels.pop('environment', current_app.config['DEFAULT_ENVIRONMENT'])
     customer = labels.pop('customer', None)
@@ -77,6 +78,13 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
     }
     attributes.update(annotations)  # any annotations left over are used for attributes
 
+    rudder_resource_type = labels.get('rudder_resource_type')
+    rudder_resource_id = labels.get('rudder_resource_id')
+    if rudder_resource_type is None or rudder_resource_id is None:
+        rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
+        if rudder_resource_type is None or rudder_resource_id is None:
+            raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
+
     return Alert(
         resource=resource,
         event=event,
@@ -93,7 +101,11 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
         event_type='prometheusAlert',
         timeout=timeout,
         raw_data=alert,
-        tags=tags
+        tags=tags,
+        enriched_data=labels.get('enriched_data', None),
+        properties=labels.get('properties', None),
+        rudder_resource_type=rudder_resource_type,
+        rudder_resource_id=rudder_resource_id,
     )
 
 
