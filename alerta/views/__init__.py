@@ -1,8 +1,10 @@
-from flask import Blueprint, current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, request, Response
 
 from alerta.app import custom_webhooks
 from alerta.exceptions import ApiError
 from alerta.utils.response import absolute_url
+from alerta.helpers.prometheus_middleware import setup_metrics
+import prometheus_client
 
 api = Blueprint('api', __name__)
 
@@ -46,3 +48,10 @@ def index():
 @api.route('/_', methods=['GET'])
 def debug():
     return 'OK'
+
+setup_metrics(api)
+
+@api.route('/metrics')
+def metrics():
+    CONTENT_TYPE_LATEST = str('text/plain; version=0.0.4; charset=utf-8')
+    return Response(prometheus_client.generate_latest(), mimetype=CONTENT_TYPE_LATEST)
