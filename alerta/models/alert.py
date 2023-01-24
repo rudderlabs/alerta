@@ -24,11 +24,13 @@ NoneType = type(None)
 sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=']
 destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
+tracking_plan_search_words = ['trackingPlanId=']
 
 resourceTypeToSearchWordsMap = {
     "source": sources_search_words,
     "destination": destinations_search_words,
-    "transformation": transformation_search_words
+    "transformation": transformation_search_words,
+    "tracking_plan": tracking_plan_search_words
 }
 
 def get_matched_tag_value(tags: list, search_words: list):
