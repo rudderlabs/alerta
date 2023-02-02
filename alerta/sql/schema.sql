@@ -344,3 +344,11 @@ CREATE TABLE IF NOT EXISTS customer_suppression_rules(
     is_active boolean not null default true,
     rules text[]
 );
+
+CREATE TABLE IF NOT EXISTS alert_metadata(
+    alert text,
+    resource_type text,
+    ditto_variant text,
+    create_time timestamp without time zone default now(),
+    update_time timestamp without time zone default now()
+);
