@@ -1853,3 +1853,31 @@ class Backend(Database):
     def find_suppression_rule_by_id(self, suppression_rule_id):
         query = f"""select * from suppression_rules where id={suppression_rule_id}"""
         return self._fetchone(query, ())
+
+
+    def create_alert_metadata(self, alert_metadata):
+        insert = """
+            INSERT INTO alert_metadata (alert, resource_type, ditto_variant)
+            VALUES (%(alert)s,%(resource_type)s,%(ditto_variant)s)
+            RETURNING *
+        """
+        return self._insert(insert, vars(alert_metadata))
+
+    def update_alert_metadata_by_alert(self, alert, alert_metadata):
+        update_list = []
+        update_list.append("resource_type=%(resource_type)s")
+        update_list.append("ditto_variant=%(ditto_variant)s")
+        update_list.append("update_time=%(update_time)s")
+        query = f"""UPDATE alert_metadata SET {','.join(update_list)} WHERE alert='{alert}' RETURNING * """
+        return self._updateone(query, {
+            "resource_type": alert_metadata.resource_type,
+            "ditto_variant": alert_metadata.ditto_variant,
+            "update_time": alert_metadata.update_time}, returning=True)
+
+    def get_alert_metadata(self):
+        query = f"""SELECT * FROM alert_metadata ORDER BY create_time """
+        return self._fetchall(query, ())
+
+    def get_alert_metada_by_alert(self, alert):
+        query = f"""SELECT * FROM alert_metadata WHERE alert='{alert}'"""
+        return self._fetchone(query, ())

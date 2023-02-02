@@ -344,3 +344,27 @@ CREATE TABLE IF NOT EXISTS customer_suppression_rules(
     is_active boolean not null default true,
     rules text[]
 );
+
+CREATE TABLE IF NOT EXISTS alert_metadata(
+    alert text PRIMARY KEY,
+    resource_type text,
+    ditto_variant text,
+    create_time timestamp without time zone default now(),
+    update_time timestamp without time zone default now()
+);
+
+INSERT INTO
+    alert_metadata(alert, resource_type, ditto_variant)
+VALUES
+    ('gateway-requests-invalid-jsons', 'source', 'invalid-json'),
+    ('event-volume-drop-source', 'source', 'event-volume-drops'),
+    ('tracking-plan-errors', 'source', 'tracking-plan-event-drops'),
+    ('ut-errors', 'transformation', 'transformation-error'),
+    ('event-volume-drop-destination', 'destination', 'event-volume-drop-destination'),
+    ('router-aborted-count-customer', 'destination', 'delivery-error'),
+    ('event-delivery-time-customer', 'destination', 'delivery-lag---cloud-destination'),
+    ('warehouse-upload-aborted', 'destination', 'delivery-error---wh-destination'),
+    ('event-delivery-time-warehouse-customer', 'destination', 'delivery-lag---wh-destination'),
+    ('warehouse-rudder-discards-customer', 'destination', 'discards'),
+    ('warehouse-load-table-column-count', 'destination', 'warehouse-column-count')
+ON CONFLICT (alert) DO NOTHING;
