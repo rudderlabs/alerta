@@ -67,6 +67,7 @@ ADD rudder-alerta-enrichment-plugin/ /opt/rudder-alerta-enrichment-plugin/
 # RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/pip install -r requirements.txt && mv rudder_enrichment /venv/lib/python3.7/site-packages/ && rm -rf /opt/rudder-alerta-enrichment-plugin/
 RUN cd /opt/rudder-alerta-enrichment-plugin && /venv/bin/python setup.py install
 ENV DITTO_JSON_PATH=/opt/rudder-alerta-enrichment-plugin/ditto/text.json
+ENV AUTH_REQUIRED=True
 
 
 ENV ALERTA_SVR_CONF_FILE /app/alertad.conf
