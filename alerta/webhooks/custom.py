@@ -14,6 +14,8 @@ from alerta.utils.audit import write_audit_trail
 from . import webhooks
 import logging
 
+LOG = logging.getLogger('alerta.webhooks')
+
 
 @webhooks.route('/webhooks/<webhook>', defaults={'path': ''}, methods=['OPTIONS', 'GET', 'POST'])
 @webhooks.route('/webhooks/<webhook>/<path:path>', methods=['OPTIONS', 'GET', 'POST'])
@@ -26,7 +28,7 @@ def custom(webhook, path):
     try:
         import json
         reqPayload = request.get_json() or request.form or request.get_data(as_text=True)
-        logging.info("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
+        LOG.info("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
         print("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
         rv = custom_webhooks.webhooks[webhook].incoming(
             path=path or request.path,
@@ -63,7 +65,7 @@ def custom(webhook, path):
                     "rudder_resource_id": alert.rudder_resource_id,
                     "webhook": webhook
                 }
-                logging.info('Received webhook alert %s' % json.dumps(log_payload))
+                LOG.info('Received webhook alert %s' % json.dumps(log_payload))
                 print('Received webhook alert %s' % json.dumps(log_payload))
                 alert = process_alert(alert)
             except RejectException as e:

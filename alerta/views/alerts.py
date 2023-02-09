@@ -29,6 +29,8 @@ from ..stats import StatsD
 import logging
 import json
 
+log_object = logging.getLogger('alerta.views.alerts')
+
 receive_timer = Timer('alerts', 'received', 'Received alerts', 'Total time and number of received alerts')
 gets_timer = Timer('alerts', 'queries', 'Alert queries', 'Total time and number of alert queries')
 status_timer = Timer('alerts', 'status', 'Alert status change', 'Total time and number of alerts with status changed')
@@ -75,7 +77,8 @@ def receive():
             "rudder_resource_type": alert.rudder_resource_type,
             "rudder_resource_id": alert.rudder_resource_id
         }
-        logging.info('Received alert %s' % json.dumps(log_payload))
+        log_object.info('Received alert %s' % json.dumps(log_payload))
+        print('Received alert %s' % json.dumps(log_payload))
         alert = process_alert(alert)
     except RejectException as e:
         audit_trail_alert(event='alert-rejected')
