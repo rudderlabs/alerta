@@ -15,7 +15,6 @@ from alerta.utils.rule_processor import process_forward_rules_for_alert
 from alerta.exceptions import (AlertaException, ApiError, BlackoutPeriod,
                                ForwardingLoop, HeartbeatReceived,
                                InvalidAction, RateLimit, RejectException)
-from alerta.models.alert_metadata import AlertMetadata
 
 
 def assign_customer(wanted: str = None, permission: Scope = Scope.admin_alerts) -> Optional[str]:
@@ -64,8 +63,7 @@ def enrich_alert(alert: Alert) -> Alert:
                     logging.debug('RudderEnrichment: enrich_alert %s', alert)
                     # TODO: do not populate enriched_data field, instead add all the metadata that we retrieved to the alert
                     # the end user message will be created later by the processor
-                    alert_metadata = AlertMetadata.find_by_alert(alert=alert.resource).serialize
-                    alert = plugin.enrich_alert(alert, alert_metadata)
+                    alert = plugin.enrich_alert(alert)
                     StatsD.increment("enrichment_process_count", 1, {"name": plugin.name})
                 except (RejectException, HeartbeatReceived, BlackoutPeriod, RateLimit, ForwardingLoop, AlertaException):
                     StatsD.increment("enrichment_process_error", 1, {"name": plugin.name})
