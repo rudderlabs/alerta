@@ -12,6 +12,10 @@ from alerta.utils.api import assign_customer, process_alert
 from alerta.utils.audit import write_audit_trail
 
 from . import webhooks
+import logging
+import json
+
+LOG = logging.getLogger('alerta.webhooks')
 
 
 @webhooks.route('/webhooks/<webhook>', defaults={'path': ''}, methods=['OPTIONS', 'GET', 'POST'])
@@ -52,6 +56,13 @@ def custom(webhook, path):
                                        request=request)
 
             try:
+                log_payload = {
+                    "alert_name": alert.resource,
+                    "rudder_resource_type": alert.rudder_resource_type,
+                    "rudder_resource_id": alert.rudder_resource_id,
+                    "webhook": webhook
+                }
+                LOG.warn('Received webhook alert %s' % json.dumps(log_payload))
                 alert = process_alert(alert)
             except RejectException as e:
                 audit_trail_alert(event='alert-rejected')
