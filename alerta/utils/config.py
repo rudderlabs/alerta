@@ -115,6 +115,8 @@ class Config:
         if config['DEFAULT_ENVIRONMENT'] not in config['ALLOWED_ENVIRONMENTS']:
             raise RuntimeError(f"Default environment \"{config['DEFAULT_ENVIRONMENT']}\" not in list of allowed environments")
 
+        config['ALERT_METADATA_CONFIG_FILE'] = get_config('ALERT_METADATA_CONFIG_FILE', default=None, type=str, config=config)
+
         return config
 
 
