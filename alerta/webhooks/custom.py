@@ -66,6 +66,9 @@ def custom(webhook, path):
                     "webhook": webhook
                 }
                 LOG.info('Received webhook alert %s' % json.dumps(log_payload))
+                LOG.info('Received webhook alert alert_name=%s rudder_resource_type=%s rudder_resource_id=%s, webhook=%s' % (
+                    alert.resource, alert.rudder_resource_type, alert.rudder_resource_id, webhook
+                ))
                 print('Received webhook alert %s' % json.dumps(log_payload))
                 alert = process_alert(alert)
             except RejectException as e:

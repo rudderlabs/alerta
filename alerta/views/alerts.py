@@ -78,6 +78,9 @@ def receive():
             "rudder_resource_id": alert.rudder_resource_id
         }
         log_object.info('Received alert %s' % json.dumps(log_payload))
+        log_object.info('Received alert alert_name=%s rudder_resource_type=%s rudder_resource_id=%s' % (
+            alert.resource, alert.rudder_resource_type, alert.rudder_resource_id
+        ))
         print('Received alert %s' % json.dumps(log_payload))
         alert = process_alert(alert)
     except RejectException as e:
