@@ -26,6 +26,7 @@ from . import api
 from ..models.channel_rule import CustomerChannelRuleMap
 from ..models.event_log import EventLog
 from ..stats import StatsD
+import logging
 
 receive_timer = Timer('alerts', 'received', 'Received alerts', 'Total time and number of received alerts')
 gets_timer = Timer('alerts', 'queries', 'Alert queries', 'Total time and number of alert queries')
@@ -68,6 +69,9 @@ def receive():
                                request=request)
 
     try:
+        logging.info('Received alert alert_name=%s rudder_resource_type=%s rudder_resource_id=%s' % (
+                alert.resource, alert.rudder_resource_type, alert.rudder_resource_id
+        ))
         alert = process_alert(alert)
     except RejectException as e:
         audit_trail_alert(event='alert-rejected')
