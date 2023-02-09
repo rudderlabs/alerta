@@ -63,6 +63,7 @@ def custom(webhook, path):
                     "webhook": webhook
                 }
                 logging.info('Received webhook alert %s' % json.dumps(log_payload))
+                print('Received webhook alert %s' % json.dumps(log_payload))
                 alert = process_alert(alert)
             except RejectException as e:
                 audit_trail_alert(event='alert-rejected')
