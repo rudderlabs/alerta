@@ -13,6 +13,7 @@ from alerta.utils.audit import write_audit_trail
 
 from . import webhooks
 import logging
+import json
 
 LOG = logging.getLogger('alerta.webhooks')
 
@@ -26,10 +27,6 @@ def custom(webhook, path):
         raise ApiError(f"Custom webhook '{webhook}' not found.", 404)
 
     try:
-        import json
-        reqPayload = request.get_json() or request.form or request.get_data(as_text=True)
-        LOG.info("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
-        print("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
         rv = custom_webhooks.webhooks[webhook].incoming(
             path=path or request.path,
             query_string=request.args,
@@ -66,10 +63,6 @@ def custom(webhook, path):
                     "webhook": webhook
                 }
                 LOG.warn('Received webhook alert %s' % json.dumps(log_payload))
-                LOG.info('Received webhook alert alert_name=%s rudder_resource_type=%s rudder_resource_id=%s, webhook=%s' % (
-                    alert.resource, alert.rudder_resource_type, alert.rudder_resource_id, webhook
-                ))
-                print('Received webhook alert %s' % json.dumps(log_payload))
                 alert = process_alert(alert)
             except RejectException as e:
                 audit_trail_alert(event='alert-rejected')
