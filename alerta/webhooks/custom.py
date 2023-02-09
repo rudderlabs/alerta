@@ -27,6 +27,7 @@ def custom(webhook, path):
         import json
         reqPayload = request.get_json() or request.form or request.get_data(as_text=True)
         logging.info("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
+        print("TEST PROMETHEUS PAYLOAD: " + json.dumps(reqPayload))
         rv = custom_webhooks.webhooks[webhook].incoming(
             path=path or request.path,
             query_string=request.args,
