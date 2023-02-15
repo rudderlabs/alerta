@@ -170,7 +170,6 @@ class Backend(Database):
              WHERE environment=%(environment)s
                AND resource=%(resource)s
                AND event=%(event)s
-               AND severity=%(severity)s
                AND rudder_resource_type=%(rudder_resource_type)s
                AND rudder_resource_id=%(rudder_resource_id)s
                AND {customer}
