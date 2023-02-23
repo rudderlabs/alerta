@@ -1,6 +1,8 @@
 import os
 
 from flask import Flask
+import json
+import logging
 
 
 class Config:
@@ -140,3 +142,13 @@ def get_config(key, default=None, type=None, **kwargs):
     except KeyError:
         rv = default
     return rv
+
+
+def get_alert_mode(alert_name):
+    try:
+        ALERT_METADATA_CONFIG_FILE = os.environ.get('ALERT_METADATA_CONFIG_FILE')
+        with open(ALERT_METADATA_CONFIG_FILE, 'r') as f:
+            alert_metadata = json.load(f)['alertMetadata']
+        return alert_metadata.get(alert_name).get('alertMode', 'PROXYMODE')
+    except Exception as e:
+        logging.error(f"Error loading alert metdadata in alerta; {e}", exc_info=True)

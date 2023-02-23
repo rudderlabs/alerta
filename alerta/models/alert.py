@@ -16,6 +16,7 @@ from alerta.models.note import Note
 from alerta.utils.format import DateTime
 from alerta.utils.hooks import status_change_hook
 from alerta.utils.response import absolute_url
+from alerta.utils.config import get_alert_mode
 
 JSON = Dict[str, Any]
 NoneType = type(None)
@@ -138,7 +139,7 @@ class Alert:
             id=json.get('id', None),
             resource=json.get('resource', None),
             event=json.get('event', None),
-            environment=json.get('environment', None),
+            environment=get_alert_mode(json.get('resource')),
             severity=json.get('severity', None),
             correlate=json.get('correlate', list()),
             status=json.get('status', None),
