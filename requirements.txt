@@ -17,3 +17,4 @@ requests_hawk==1.1.1
 sentry-sdk[flask]==1.4.1
 statsd-telegraf==3.2.1.post1
 validators==0.18.2
+sentry-sdk>=1.14.0 # not directly required, pinned by Snyk to avoid a vulnerability
