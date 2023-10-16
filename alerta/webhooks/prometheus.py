@@ -9,6 +9,8 @@ from alerta.models.alert import Alert
 
 from . import WebhookBase
 from alerta.models.alert import get_rudder_resource_from_tags
+import json
+from alerta.utils.config import get_alert_mode
 
 JSON = Dict[str, Any]
 dt = datetime.datetime
@@ -45,8 +47,7 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
 
     # labels
     resource = labels.pop('resource', None) or labels.pop('alertname')
-    event = labels.pop('event', None) or labels.pop('alertname')
-    environment = labels.pop('environment', current_app.config['DEFAULT_ENVIRONMENT'])
+    environment = get_alert_mode(resource)
     customer = labels.pop('customer', None)
     correlate = labels.pop('correlate').split(',') if 'correlate' in labels else None
     service = labels.pop('service', '').split(',')
@@ -59,6 +60,7 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
         timeout = None
 
     tags = [f'{k}={v}' for k, v in labels.items()]  # any labels left over are used for tags
+    event = json.dumps(labels, sort_keys=True)
 
     # annotations
     value = annotations.pop('value', None)
