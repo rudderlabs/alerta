@@ -13,7 +13,7 @@ jobs:
     - name: Set private key
       uses: webfactory/ssh-agent@v0.5.4
       with:
-          ssh-private-key: ${{ secrets.GIT_SSH_KEY }}
+          ssh-private-key: ${{ secrets.PAT }}
     - name: Get branch name
       id: branch-name
       uses: tj-actions/branch-names@v5.1
