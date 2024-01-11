@@ -22,7 +22,7 @@ JSON = Dict[str, Any]
 NoneType = type(None)
 
 
-sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=']
+sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=', 'source_id=']
 destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
 
