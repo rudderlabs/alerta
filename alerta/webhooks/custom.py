@@ -23,6 +23,10 @@ LOG = logging.getLogger('alerta.webhooks')
 @cross_origin()
 @permission(Scope.write_webhooks)
 def custom(webhook, path):
+    try:
+        LOG.debug('Webhook alert with full payload: %s' % json.dumps(request.get_json()))
+    except Exception as e:
+        pass
     if webhook not in custom_webhooks.webhooks:
         raise ApiError(f"Custom webhook '{webhook}' not found.", 404)
 
