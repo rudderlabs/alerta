@@ -1,5 +1,4 @@
-Alerta Release 8.0
-==================
+# Alerta Release 8.0
 
 [![Actions Status](https://github.com/alerta/alerta/workflows/CI%20Tests/badge.svg)](https://github.com/alerta/alerta/actions)
 [![Slack chat](https://img.shields.io/badge/chat-on%20slack-blue?logo=slack)](https://slack.alerta.dev)
@@ -8,16 +7,15 @@ Alerta Release 8.0
 
 The Alerta monitoring tool was developed with the following aims in mind:
 
-*   distributed and de-coupled so that it is **SCALABLE**
-*   minimal **CONFIGURATION** that easily accepts alerts from any source
-*   quick at-a-glance **VISUALISATION** with drill-down to detail
+- distributed and de-coupled so that it is **SCALABLE**
+- minimal **CONFIGURATION** that easily accepts alerts from any source
+- quick at-a-glance **VISUALISATION** with drill-down to detail
 
 ![webui](/docs/images/alerta-webui-v7.jpg?raw=true)
 
-----
+---
 
-Requirements
-------------
+## Requirements
 
 Release 8 only supports Python 3.6 or higher.
 
@@ -26,8 +24,7 @@ The only mandatory dependency is MongoDB or PostgreSQL. Everything else is optio
 - Postgres version 9.5 or better
 - MongoDB version 3.6 or better (4.0.7 required for full query syntax support)
 
-Installation
-------------
+## Installation
 
 To install MongoDB on Debian/Ubuntu run:
 
@@ -54,25 +51,23 @@ To install the web console run:
     >> browse to http://localhost:8000
 
 ### Docker
+
 Alerta and MongoDB can also run using Docker containers, see [alerta/docker-alerta](https://github.com/alerta/docker-alerta).
 
-Configuration
--------------
+## Configuration
 
-To configure the ``alertad`` server override the default settings in ``/etc/alertad.conf``
-or using ``ALERTA_SVR_CONF_FILE`` environment variable::
+To configure the `alertad` server override the default settings in `/etc/alertad.conf`
+or using `ALERTA_SVR_CONF_FILE` environment variable::
 
     $ ALERTA_SVR_CONF_FILE=~/.alertad.conf
     $ echo "DEBUG=True" > $ALERTA_SVR_CONF_FILE
 
-Documentation
--------------
+## Documentation
 
 More information on configuration and other aspects of alerta can be found
 at <http://docs.alerta.io>
 
-Development
------------
+## Development
 
 To run in development mode, listening on port 5000:
 
@@ -89,8 +84,7 @@ reporting errors to [Sentry](https://sentry.io):
     $ pip install -e .[postgres]
     $ flask run --debugger --port 8080 --with-threads --reload
 
-Troubleshooting
----------------
+## Troubleshooting
 
 Enable debug log output by setting `DEBUG=True` in the API server
 configuration:
@@ -106,10 +100,9 @@ LOG_FILE = '$HOME/alertad.log'
 It can also be helpful to check the web browser developer console for
 JavaScript logging, network problems and API error responses.
 
-Tests
------
+## Tests
 
-To run the *all* the tests there must be a local Postgres
+To run the _all_ the tests there must be a local Postgres
 and MongoDB database running. Then run:
 
     $ TOXENV=ALL make test
@@ -124,15 +117,13 @@ To run a single test run something like:
     $ TOXENV="mongodb -- tests/test_search.py::QueryParserTestCase::test_boolean_operators" make test
     $ TOXENV="postgres -- tests/test_queryparser.py::PostgresQueryTestCase::test_boolean_operators" make test
 
-Cloud Deployment
-----------------
+## Cloud Deployment
 
 Alerta can be deployed to the cloud easily using Heroku <https://github.com/alerta/heroku-api-alerta>,
 AWS EC2 <https://github.com/alerta/alerta-cloudformation>, or Google Cloud Platform
 <https://github.com/alerta/gcloud-api-alerta>
 
-License
--------
+## License
 
     Alerta monitoring system and console
     Copyright 2012-2020 Nick Satterly
@@ -149,6 +140,6 @@ License
     See the License for the specific language governing permissions and
     limitations under the License.
 
-
 ---
+
 Uses stats from https://github.com/Granitosaurus/statsd-telegraf
