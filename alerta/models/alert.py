@@ -27,8 +27,8 @@ destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'des
 transformation_search_words = ['transformationId=', 'transformation_id=']
 
 resourceTypeToSearchWordsMap = {
-    "source": sources_search_words,
     "destination": destinations_search_words,
+    "source": sources_search_words,
     "transformation": transformation_search_words
 }
 
