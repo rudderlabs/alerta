@@ -182,7 +182,7 @@ DEFAULT_PREVIOUS_SEVERITY = None
 COLOR_MAP = {}  # type: Dict[str, Any]
 
 # Timeout settings
-DEFAULT_TIMEOUT = 86400  # seconds
+DEFAULT_TIMEOUT = 120  # seconds
 ALERT_TIMEOUT = DEFAULT_TIMEOUT
 HEARTBEAT_TIMEOUT = DEFAULT_TIMEOUT
 HEARTBEAT_MAX_LATENCY = 2000  # ms
@@ -190,7 +190,7 @@ ACK_TIMEOUT = 0  # auto-unack alerts after x seconds (0 seconds = do not auto-un
 SHELVE_TIMEOUT = 7200  # auto-unshelve alerts after x seconds (0 seconds = do not auto-unshelve)
 
 # Housekeeping settings
-DELETE_EXPIRED_AFTER = 2 * 60 * 60  # seconds (0 = do not delete)
+DELETE_EXPIRED_AFTER = 2 * 60  # seconds (0 = do not delete)
 DELETE_INFO_AFTER = 12 * 60 * 60  # seconds (0 = do not delete)
 
 # Send verification emails to new BasicAuth users
