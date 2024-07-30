@@ -1,0 +1,28 @@
+name: "Build and push release image"
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: build and push
+        run: |
+          docker login --username rudderlabs --password '${{ secrets.DOCKER_HUB_PASSWORD }}'
+          export VERSION=${{steps.version_check_staging.outputs.releaseVersion}}
+          rm -rf rudder-alerta-enrichment-plugin
+          git clone -b "$(cat RUDDER_ENRICH_PLUGIN_BRANCH_NAME)" https://${{ secrets.PAT_USERNAME }}:${{ secrets.PAT }}@github.com/rudderlabs/rudder-alerta-enrichment-plugin.git
+          docker build --no-cache --build-arg=COMMIT_ID_VALUE="$(git log --format="%H" -n 1)" -t rudderlabs/alerta:$VERSION .
+          docker push rudderlabs/alerta:$VERSION
+          rm -rf rudder-alerta-enrichment-plugin
