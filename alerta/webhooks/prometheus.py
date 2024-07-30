@@ -8,7 +8,7 @@ from alerta.exceptions import ApiError
 from alerta.models.alert import Alert
 
 from . import WebhookBase
-from alerta.models.alert import get_rudder_resource_from_tags, add_custom_tags
+from alerta.models.alert import get_rudder_resource_from_tags, add_custom_labels
 import json
 from alerta.utils.config import get_alert_mode
 
@@ -25,6 +25,7 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
     # See https://github.com/prometheus/prometheus/issues/2818
 
     labels = {}
+    alert['labels'] = add_custom_labels(alert['labels'])
     for k, v in alert['labels'].items():
         try:
             labels[k] = v.format(**alert['labels'])
@@ -60,7 +61,6 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
         timeout = None
 
     tags = [f'{k}={v}' for k, v in labels.items()]  # any labels left over are used for tags
-    tags = add_custom_tags(tags)
     event = json.dumps(labels, sort_keys=True)
 
     # annotations

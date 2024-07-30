@@ -51,23 +51,11 @@ def get_rudder_resource_from_tags(tags):
             break
     return rudder_resource_type, rudder_resource_id
 
-def add_custom_tags(tags: list):
-    # for profiles alerts, add profile_id as a tag
-    print("Before adding custom tags: ", tags)
-
-    is_profiles_alert = False
-    profile_id = None
-    for tag in tags:
-        if tag == 'category=wht':
-            is_profiles_alert = True
-        elif tag.startswith('job_id='):
-            profile_id = tag.split('=')[1]
-    
-    if is_profiles_alert and profile_id is not None:
-        tags.append('profile_id=' + profile_id)
-
-    print("After adding custom tags: ", tags)
-    return tags;
+def add_custom_labels(labels: JSON):
+    # for profiles alerts, add profile_id as a label
+    if labels['category'] == 'wht' and 'job_id' in labels:
+        labels['profile_id'] = labels['job_id']
+    return labels;
 
 class Alert:
 
