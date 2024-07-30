@@ -53,11 +53,12 @@ def get_rudder_resource_from_tags(tags):
 
 def add_custom_tags(json):
     # for profiles alerts, add profile_id as a tag
+    print("Before adding custom tags: ", json)
     tags = json.get('tags', list())
     if tags and tags['category'] == 'wht':
         tags['profile_id'] = tags["job_id"]
         json['tags'] = tags
-
+    print("After adding custom tags: ", json)
     return json;
 
 class Alert:
