@@ -24,11 +24,13 @@ NoneType = type(None)
 
 sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=', 'source_id=']
 destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=', 'destination_id=']
+profiles_search_words = ['profile_id=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
 
 resourceTypeToSearchWordsMap = {
     "destination": destinations_search_words,
     "source": sources_search_words,
+    "profile": profiles_search_words,
     "transformation": transformation_search_words
 }
 
@@ -48,6 +50,15 @@ def get_rudder_resource_from_tags(tags):
             rudder_resource_id = resourceId
             break
     return rudder_resource_type, rudder_resource_id
+
+def add_custom_tags(tags):
+    # for profiles alerts, add profile_id as a tag
+    print("Before adding custom tags: ", tags)
+    # for tag in tags:
+    #     if 'job_id=' in tag:
+    #         tags.append('profile_id=' + tag.split('=')[1])
+    print("After adding custom tags: ", tags)
+    return tags;
 
 class Alert:
 
@@ -130,6 +141,7 @@ class Alert:
         rudder_resource_type = json.get('rudder_resource_type')
         rudder_resource_id = json.get('rudder_resource_id')
         tags = json.get('tags', list())
+        tags = add_custom_tags(tags)
         if rudder_resource_type is None or rudder_resource_id is None:
             rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
             if rudder_resource_type is None or rudder_resource_id is None:
@@ -258,6 +270,7 @@ class Alert:
         rudder_resource_type=doc.get('rudder_resource_type', None)
         rudder_resource_id=doc.get('rudder_resource_id', None)
         tags=doc.get('tags', list())
+        tags = add_custom_tags(tags)
         if rudder_resource_type is None or rudder_resource_id is None:
             rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
             if rudder_resource_type is None or rudder_resource_id is None:
@@ -317,6 +330,7 @@ class Alert:
             rudder_resource_id = None
 
         tags=rec.tags
+        tags = add_custom_tags(tags)
         if rudder_resource_type is None or rudder_resource_id is None:
             rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
             if rudder_resource_type is None or rudder_resource_id is None:
