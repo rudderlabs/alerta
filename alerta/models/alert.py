@@ -25,8 +25,10 @@ NoneType = type(None)
 sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=', 'source_id=']
 destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=', 'destination_id=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
+job_search_words = ['jobId=', 'job_id=']
 
 resourceTypeToSearchWordsMap = {
+    "job": job_search_words,
     "destination": destinations_search_words,
     "source": sources_search_words,
     "transformation": transformation_search_words
