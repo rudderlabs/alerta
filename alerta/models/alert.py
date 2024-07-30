@@ -53,8 +53,8 @@ def get_rudder_resource_from_tags(tags):
 
 def add_custom_labels(labels: JSON):
     # for profiles alerts, add profile_id as a label
-    if labels['category'] == 'wht' and 'job_id' in labels:
-        labels['profile_id'] = labels['job_id']
+    if labels.get('category') == 'wht' and 'job_id' in labels:
+        labels['profile_id'] = labels.get('job_id')
     return labels;
 
 class Alert:
