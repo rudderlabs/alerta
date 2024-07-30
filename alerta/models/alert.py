@@ -25,12 +25,12 @@ NoneType = type(None)
 sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=', 'source_id=']
 destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=', 'destination_id=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
-job_search_words = ['jobId=', 'job_id=']
+profile_search_words = ['profile_id=']
 
 resourceTypeToSearchWordsMap = {
-    "job": job_search_words,
     "destination": destinations_search_words,
     "source": sources_search_words,
+    "profile": profile_search_words,
     "transformation": transformation_search_words
 }
 
@@ -50,6 +50,15 @@ def get_rudder_resource_from_tags(tags):
             rudder_resource_id = resourceId
             break
     return rudder_resource_type, rudder_resource_id
+
+def add_custom_tags(json):
+    # for profiles alerts, add profile_id as a tag
+    tags = json.get('tags', list())
+    if tags and tags['category'] == 'wht':
+        tags['profile_id'] = tags["job_id"]
+        json['tags'] = tags
+
+    return json;
 
 class Alert:
 
@@ -129,6 +138,7 @@ class Alert:
             raise ValueError('timeout must be an integer')
         if json.get('customer', None) == '':
             raise ValueError('customer must not be an empty string')
+        json = add_custom_tags(json)
         rudder_resource_type = json.get('rudder_resource_type')
         rudder_resource_id = json.get('rudder_resource_id')
         tags = json.get('tags', list())
