@@ -8,3 +8,5 @@ venv
 .coverage
 *.swp
 *.log
+.git
+rudder-alerta-enrichment-plugin/.git
