@@ -8,4 +8,4 @@ venv
 .coverage
 *.swp
 *.log
-.git
+**/.git
