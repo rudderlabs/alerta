@@ -1,0 +1,11 @@
+name: Sync Ditto Changes
+on: workflow_dispatch
+
+jobs:
+  sync-ditto-changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync Ditto Changes and create a PR
+        uses: dittowords/ditto-github-action@v0.2.0
+        with:
+          ditto-api-key: ${{ secrets.DITTO_API_KEY }}
