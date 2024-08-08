@@ -26,7 +26,7 @@ jobs:
         failBuild: true
       id: version_check_staging
     - run: |
-        docker login --username rudderlabs --password '${{ secrets.DOCKER_HUB_PASSWORD }}'
+        docker login --username rudderlabs --password '${{ secrets.DOCKERHUB_TOKEN }}'
         export VERSION=${{steps.version_check_staging.outputs.releaseVersion}}
         rm -rf rudder-alerta-enrichment-plugin
         git clone -b "$(cat RUDDER_ENRICH_PLUGIN_BRANCH_NAME)" https://${{ secrets.PAT_USERNAME }}:${{ secrets.PAT }}@github.com/rudderlabs/rudder-alerta-enrichment-plugin.git
