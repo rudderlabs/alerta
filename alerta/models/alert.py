@@ -24,11 +24,13 @@ NoneType = type(None)
 
 sources_search_words = ['sourceID=', 'sourceId=', 'source-id=', 'source=', 'source_id=']
 destinations_search_words = ['destID=', 'destinationId=', 'destinationID=', 'destination-id=', 'destId=', 'destination_id=']
+profiles_search_words = ['profile_id=']
 transformation_search_words = ['transformationId=', 'transformation_id=']
 
 resourceTypeToSearchWordsMap = {
     "destination": destinations_search_words,
     "source": sources_search_words,
+    "profile": profiles_search_words,
     "transformation": transformation_search_words
 }
 
@@ -48,6 +50,12 @@ def get_rudder_resource_from_tags(tags):
             rudder_resource_id = resourceId
             break
     return rudder_resource_type, rudder_resource_id
+
+def add_custom_labels(labels: JSON):
+    # for profiles alerts, add profile_id as a label
+    if labels.get('category') == 'wht' and 'job_id' in labels:
+        labels['profile_id'] = labels.get('job_id')
+    return labels;
 
 class Alert:
 

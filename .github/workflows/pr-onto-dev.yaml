@@ -21,7 +21,7 @@ jobs:
     #     tagFormat: v${version}
     #     failBuild: true
     - run: |
-        docker login --username rudderlabs --password '${{ secrets.DOCKER_HUB_PASSWORD }}'
+        docker login --username rudderlabs --password '${{ secrets.DOCKERHUB_TOKEN }}'
         export VERSION=${{ steps.branch-name.outputs.current_branch }}
         rm -rf rudder-alerta-enrichment-plugin
         git config --global url."https://${{secrets.PAT}}:x-oauth-basic@github.com/rudderlabs".insteadOf "https://github.com/rudderlabs"
