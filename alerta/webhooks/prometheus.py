@@ -1,3 +1,4 @@
+import logging
 import datetime
 from typing import Any, Dict
 
@@ -86,7 +87,8 @@ def parse_prometheus(alert: JSON, external_url: str) -> Alert:
     if rudder_resource_type is None or rudder_resource_id is None:
         rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
         if rudder_resource_type is None or rudder_resource_id is None:
-            raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
+            logging.error('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
+            raise ValueError('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
 
     return Alert(
         resource=resource,
