@@ -5,5 +5,4 @@ pytest-cov
 pytest>=5.4.3
 python-dotenv
 requests_mock
-twine
 setuptools>=70.0.0
