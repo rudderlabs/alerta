@@ -3,3 +3,4 @@ pysaml2==6.5.1
 python-ldap==3.3.1
 gunicorn==22.0.0
 gevent==23.9.0
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
