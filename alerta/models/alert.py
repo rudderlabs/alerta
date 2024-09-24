@@ -1,6 +1,7 @@
 import os
 import platform
 import sys
+import logging
 from datetime import datetime
 from typing import Optional  # noqa
 from typing import Any, Dict, List, Tuple, Union
@@ -141,7 +142,8 @@ class Alert:
         if rudder_resource_type is None or rudder_resource_id is None:
             rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
             if rudder_resource_type is None or rudder_resource_id is None:
-                raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
+                logging.error('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
+                raise ValueError('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
 
         return Alert(
             id=json.get('id', None),
@@ -269,7 +271,8 @@ class Alert:
         if rudder_resource_type is None or rudder_resource_id is None:
             rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
             if rudder_resource_type is None or rudder_resource_id is None:
-                raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
+                logging.error('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
+                raise ValueError('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
         return Alert(
             id=doc.get('id', None) or doc.get('_id'),
             resource=doc.get('resource', None),
@@ -328,7 +331,8 @@ class Alert:
         if rudder_resource_type is None or rudder_resource_id is None:
             rudder_resource_type, rudder_resource_id = get_rudder_resource_from_tags(tags)
             if rudder_resource_type is None or rudder_resource_id is None:
-                raise ValueError('rudder_resource_type or rudder_resource_id missing - couldnt parse them from tags too')
+                logging.error('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
+                raise ValueError('rudder_resource_type or rudder_resource_id missing - could not parse them from tags too')
         
         return Alert(
             id=rec.id,
