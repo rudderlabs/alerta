@@ -3,7 +3,6 @@
 VENV=venv
 PYTHON=$(VENV)/bin/python
 PIP=$(VENV)/bin/pip --disable-pip-version-check
-PYLINT=$(VENV)/bin/pylint
 MYPY=$(VENV)/bin/mypy
 BLACK=$(VENV)/bin/black
 TOX=$(VENV)/bin/tox
@@ -31,9 +30,6 @@ all:	help
 
 $(PIP):
 	python3 -m venv $(VENV)
-
-$(PYLINT): $(PIP)
-	$(PIP) install pylint
 
 $(MYPY): $(PIP)
 	$(PIP) install mypy
@@ -67,12 +63,6 @@ format: $(BLACK)
 ## hooks			- Run pre-commit hooks.
 hooks: $(PRE_COMMIT)
 	$(PRE_COMMIT) run --all-files --show-diff-on-failure
-
-## lint			- Lint and type checking.
-lint: $(PYLINT) $(BLACK) $(MYPY)
-	$(PYLINT) --rcfile pylintrc $(PROJECT)
-	$(BLACK) -l120 -S --check -v $(PROJECT) || true
-	$(MYPY) $(PROJECT)/
 
 ## test.unit		- Run unit tests.
 test: test.unit
