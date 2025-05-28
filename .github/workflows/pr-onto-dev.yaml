@@ -12,7 +12,7 @@ jobs:
         fetch-depth: '0'
     - name: Get branch name
       id: branch-name
-      uses: tj-actions/branch-names@v5.1
+      uses: tj-actions/branch-names@b99758d88d96a27ee98b444451c1602a4507d243
     # - run: git fetch --all --tags
     # - name: Check Release Version
     #   uses: thebongy/version-check@v1
