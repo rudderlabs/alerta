@@ -50,7 +50,7 @@ jobs:
         uses: rudderlabs/build-scan-push-action@v1.5.3
         with:
           context: .
-          push: false # todo: make it true
+          push: false # todo: change to true
           tags: ${{ steps.meta.outputs.tags }}
           target: production
           build-args: |
