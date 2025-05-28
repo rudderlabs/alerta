@@ -1,0 +1,7 @@
+/usr/lib/**
+
+/var/lib/dpkg/
+venv/
+
+/app/tests/test_providers.py
+/app/tests/integration/fixtures/docker-compose.yml
