@@ -53,6 +53,7 @@ jobs:
           push: false # todo: change to true
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
             COMMIT_ID_VALUE=$(git log --format="%H" -n 1)
 
       - name: Clean up enrichment plugin
