@@ -52,7 +52,6 @@ jobs:
           context: .
           push: false # todo: change to true
           tags: ${{ steps.meta.outputs.tags }}
-          target: production
           build-args: |
             COMMIT_ID_VALUE=$(git log --format="%H" -n 1)
 
