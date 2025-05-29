@@ -36,7 +36,7 @@ jobs:
           failBuild: true
         id: get_release_version
 
-      - name: Clone Enrichment Plugin
+      - name: Clone enrichment plugin
         run: |
           rm -rf rudder-alerta-enrichment-plugin
           git config --global url."https://${{secrets.PAT}}:x-oauth-basic@github.com/rudderlabs".insteadOf "https://github.com/rudderlabs"

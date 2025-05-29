@@ -39,7 +39,7 @@ jobs:
           tags: |
             type=raw,value=${{ github.head_ref }}
 
-      - name: Clone Enrichment Plugin
+      - name: Clone enrichment plugin
         run: |
           rm -rf rudder-alerta-enrichment-plugin
           git config --global url."https://${{secrets.PAT}}:x-oauth-basic@github.com/rudderlabs".insteadOf "https://github.com/rudderlabs"
