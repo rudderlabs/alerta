@@ -1,4 +1,4 @@
-name: Build and push new release to DockerHub
+name: Build, scan and push new tag
 on:
   push:
     branches:
