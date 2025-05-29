@@ -38,7 +38,6 @@ jobs:
             latest=false
           tags: |
             type=raw,value=${{ github.head_ref }}
-            type=semver,pattern=v{{version}}
 
       - name: Clone Enrichment Plugin
         run: |
