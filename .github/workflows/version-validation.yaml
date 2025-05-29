@@ -1,0 +1,19 @@
+name: Version Validation
+on:
+  pull_request:
+    branches:
+      - master
+jobs:
+  version-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: git fetch --all --tags
+
+      - name: Check Release Version
+        uses: thebongy/version-check@v1
+        with:
+          file: package.json
+          tagFormat: v${version}
+          failBuild: true

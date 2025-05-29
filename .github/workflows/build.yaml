@@ -1,17 +1,8 @@
-name: Pull Request Onto Develop
+name: Build and push new release to DockerHub
 on:
-  pull_request:
+  push:
     branches:
-      - develop
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref }}
-  cancel-in-progress: true
-
-permissions:
-  id-token: write # allows the JWT to be requested from GitHub's OIDC provider
-  contents: read # This is required for actions/checkout
-
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,16 +19,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
+      - name: Get Release Version
+        uses: thebongy/version-check@b88eb2decc2ece667edf2d78665e88254e8403d6
         with:
-          images: |
-            rudderlabs/alerta
-          flavor: |
-            latest=false
-          tags: |
-            type=raw,value=${{ github.head_ref }}
+          file: package.json
+          tagFormat: v${version}
+          failBuild: true
+        id: get_release_version
 
       - name: Clone Enrichment Plugin
         run: |
@@ -50,7 +38,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: rudderlabs/alerta:${{ steps.get_release_version.outputs.releaseVersion }}
           build-args: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
             COMMIT_ID_VALUE=$(git log --format="%H" -n 1)
@@ -58,3 +46,14 @@ jobs:
       - name: Clean up enrichment plugin
         run: |
           rm -rf rudder-alerta-enrichment-plugin
+
+      - name: Create tag
+        uses: actions/github-script@441359b1a30438de65712c2fbca0abe4816fa667
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{steps.get_release_version.outputs.releaseVersion}}',
+              sha: context.sha
+            })
