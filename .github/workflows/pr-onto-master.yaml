@@ -17,7 +17,7 @@ jobs:
       - run: git fetch --all --tags
 
       - name: Check Release Version
-        uses: thebongy/version-check@v1
+        uses: thebongy/version-check@b88eb2decc2ece667edf2d78665e88254e8403d6
         with:
           file: package.json
           tagFormat: v${version}
