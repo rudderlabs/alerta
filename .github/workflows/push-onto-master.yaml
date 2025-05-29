@@ -1,12 +1,8 @@
 name: Push to master
-# on:
-#   push:
-#     branches:
-#       - master
 on:
-  pull_request:
+  push:
     branches:
-      - develop
+      - master
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
@@ -50,8 +46,8 @@ jobs:
         uses: rudderlabs/build-scan-push-action@v1.5.3
         with:
           context: .
-          push: false # todo: change to true
-          tags: rudderlabs/alerta:${{ steps.get_release_version.outputs.releaseVersion }}-testing # todo: remove testing suffix after testing
+          push: true
+          tags: rudderlabs/alerta:${{ steps.get_release_version.outputs.releaseVersion }}
           build-args: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
             COMMIT_ID_VALUE=$(git log --format="%H" -n 1)
@@ -60,13 +56,13 @@ jobs:
         run: |
           rm -rf rudder-alerta-enrichment-plugin
 
-      # - name: Create tag
-      #   uses: actions/github-script@441359b1a30438de65712c2fbca0abe4816fa667
-      #   with:
-      #     script: |
-      #       github.rest.git.createRef({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         ref: 'refs/tags/${{steps.get_release_version.outputs.releaseVersion}}',
-      #         sha: context.sha
-      #       })
+      - name: Create tag
+        uses: actions/github-script@441359b1a30438de65712c2fbca0abe4816fa667
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${{steps.get_release_version.outputs.releaseVersion}}',
+              sha: context.sha
+            })
