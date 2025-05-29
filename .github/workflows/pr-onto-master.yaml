@@ -1,8 +1,8 @@
-name: Version Validation
+name: PR onto master
 on:
   pull_request:
     branches:
-      - master
+      - develop # change to master after testing
 jobs:
   version-validation:
     runs-on: ubuntu-latest

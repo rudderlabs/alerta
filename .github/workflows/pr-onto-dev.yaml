@@ -1,4 +1,4 @@
-name: Build, scan and push PR image
+name: PR onto develop
 on:
   pull_request:
     branches:

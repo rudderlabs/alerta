@@ -1,8 +1,12 @@
-name: Build, scan and push new tag
+name: Push to master
+# on:
+#   push:
+#     branches:
+#       - master
 on:
-  push:
+  pull_request:
     branches:
-      - master
+      - develop
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -37,7 +41,7 @@ jobs:
         uses: rudderlabs/build-scan-push-action@v1.5.3
         with:
           context: .
-          push: true
+          push: false # todo: change to true
           tags: rudderlabs/alerta:${{ steps.get_release_version.outputs.releaseVersion }}
           build-args: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
@@ -47,13 +51,13 @@ jobs:
         run: |
           rm -rf rudder-alerta-enrichment-plugin
 
-      - name: Create tag
-        uses: actions/github-script@441359b1a30438de65712c2fbca0abe4816fa667
-        with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{steps.get_release_version.outputs.releaseVersion}}',
-              sha: context.sha
-            })
+      # - name: Create tag
+      #   uses: actions/github-script@441359b1a30438de65712c2fbca0abe4816fa667
+      #   with:
+      #     script: |
+      #       github.rest.git.createRef({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         ref: 'refs/tags/${{steps.get_release_version.outputs.releaseVersion}}',
+      #         sha: context.sha
+      #       })
