@@ -3,6 +3,11 @@ on:
   pull_request:
     branches:
       - develop # change to master after testing
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   version-validation:
     runs-on: ubuntu-latest
