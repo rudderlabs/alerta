@@ -53,8 +53,6 @@ jobs:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          driver: docker
-          no-cache: true
           build-args: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
             COMMIT_ID_VALUE=$(git log --format="%H" -n 1)
