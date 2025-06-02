@@ -10,7 +10,7 @@ concurrency:
 
 permissions:
   id-token: write # allows the JWT to be requested from GitHub's OIDC provider
-  contents: read # This is required for actions/checkout
+  contents: write # This is required for actions/checkout and github-script to create tags
 
 jobs:
   build:
