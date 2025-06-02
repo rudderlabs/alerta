@@ -1,26 +1,24 @@
-name: Pull Request Onto Develop
+name: PR onto master
 on:
   pull_request:
     branches:
       - master
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  version-validation:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-    - name: Set private key
-      uses: webfactory/ssh-agent@v0.5.4
-      with:
-          ssh-private-key: ${{ secrets.GIT_SSH_KEY }}
-    - name: Get branch name
-      id: branch-name
-      uses: tj-actions/branch-names@v5.1
-    - run: git fetch --all --tags
-    - name: Check Release Version
-      uses: thebongy/version-check@v1
-      with:
-        file: package.json
-        tagFormat: v${version}
-        failBuild: true
+      - uses: actions/checkout@v2
+
+      - run: git fetch --all --tags
+
+      - name: Check Release Version
+        uses: thebongy/version-check@b88eb2decc2ece667edf2d78665e88254e8403d6
+        with:
+          file: package.json
+          tagFormat: v${version}
+          failBuild: true

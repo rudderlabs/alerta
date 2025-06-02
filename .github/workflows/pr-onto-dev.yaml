@@ -1,32 +1,60 @@
-name: Pull Request Onto Develop
+name: PR onto develop
 on:
   pull_request:
     branches:
       - develop
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+permissions:
+  id-token: write # allows the JWT to be requested from GitHub's OIDC provider
+  contents: read # This is required for actions/checkout
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: '0'
-    - name: Get branch name
-      id: branch-name
-      uses: tj-actions/branch-names@v5.1
-    # - run: git fetch --all --tags
-    # - name: Check Release Version
-    #   uses: thebongy/version-check@v1
-    #   with:
-    #     file: worker/package.json
-    #     tagFormat: v${version}
-    #     failBuild: true
-    - run: |
-        docker login --username rudderlabs --password '${{ secrets.DOCKERHUB_TOKEN }}'
-        export VERSION=${{ steps.branch-name.outputs.current_branch }}
-        rm -rf rudder-alerta-enrichment-plugin
-        git config --global url."https://${{secrets.PAT}}:x-oauth-basic@github.com/rudderlabs".insteadOf "https://github.com/rudderlabs"
-        git clone -b "$(cat RUDDER_ENRICH_PLUGIN_BRANCH_NAME)" https://github.com/rudderlabs/rudder-alerta-enrichment-plugin.git
-        docker build --no-cache --build-arg=COMMIT_ID_VALUE="$(git log --format="%H" -n 1)" -t rudderlabs/alerta:$VERSION .
-        docker push rudderlabs/alerta:$VERSION
-        rm -rf rudder-alerta-enrichment-plugin
-      name: Docker build and push
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            rudderlabs/alerta
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ github.head_ref }}
+
+      - name: Clone enrichment plugin
+        run: |
+          rm -rf rudder-alerta-enrichment-plugin
+          git config --global url."https://${{secrets.PAT}}:x-oauth-basic@github.com/rudderlabs".insteadOf "https://github.com/rudderlabs"
+          git clone -b "$(cat RUDDER_ENRICH_PLUGIN_BRANCH_NAME)" https://github.com/rudderlabs/rudder-alerta-enrichment-plugin.git
+
+      - name: Build, scan and push
+        uses: rudderlabs/build-scan-push-action@v1.5.3
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            COMMIT_ID_VALUE=$(git log --format="%H" -n 1)
+
+      - name: Clean up enrichment plugin
+        run: |
+          rm -rf rudder-alerta-enrichment-plugin

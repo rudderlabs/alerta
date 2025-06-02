@@ -1,0 +1,10 @@
+/usr/lib/**
+/usr/share/**
+/usr/local/lib/python3.9/site-packages/**
+
+/var/lib/dpkg/
+venv/
+
+/app/README.md
+/app/tests/test_providers.py
+/app/tests/integration/fixtures/docker-compose.yml
