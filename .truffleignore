@@ -4,6 +4,7 @@
 
 /var/lib/dpkg/
 venv/
+/usr/bin/perl 
 
 /app/README.md
 /app/tests/test_providers.py
