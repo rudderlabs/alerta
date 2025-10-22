@@ -16,21 +16,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@f4a75cfd619ee5ce8d5b864b0d183aff3c69b55a # v2.13.1
+        with:
+          egress-policy: audit
+
       - name: Check out repository code
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3.6.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
 
       - name: Login to DockerHub
-        uses: docker/login-action@v3
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@818d4b7b91585d195f67373fd9cb0332e31a7175 # v4.6.0
         with:
           images: |
             rudderlabs/alerta
@@ -46,7 +51,7 @@ jobs:
           git clone -b "$(cat RUDDER_ENRICH_PLUGIN_BRANCH_NAME)" https://github.com/rudderlabs/rudder-alerta-enrichment-plugin.git
 
       - name: Build, scan and push
-        uses: rudderlabs/build-scan-push-action@v1.5.3
+        uses: rudderlabs/build-scan-push-action@6da37ae441adc487f22920ca87bf52d6fd715fd3 # v1.5.3
         with:
           context: .
           push: true
