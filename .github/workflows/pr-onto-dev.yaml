@@ -46,7 +46,7 @@ jobs:
           git clone -b "$(cat RUDDER_ENRICH_PLUGIN_BRANCH_NAME)" https://github.com/rudderlabs/rudder-alerta-enrichment-plugin.git
 
       - name: Build, scan and push
-        uses: rudderlabs/build-scan-push-action@v1.5.3
+        uses: rudderlabs/build-scan-push-action@d4991410238cec1b416875f1eb0e7a4565ac29aa # v1.8.2
         with:
           context: .
           push: true
